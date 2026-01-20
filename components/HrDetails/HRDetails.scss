@@ -1,0 +1,129 @@
+.hr-contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: #fff;
+    border: 1px solid var(--primary-color);
+    padding: 2rem 2%;
+    color: #000;
+    gap: 1.5rem;
+    margin-top: 5rem;
+    border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    max-width: 60%;
+    margin-inline: auto;
+
+    @media (max-width: 1550px) {
+        max-width: 80%;
+    }
+
+    @media (max-width: 1250px) {
+        max-width: 90%;
+    }
+
+    @media (max-width: 1050px) {
+        max-width: 100%;
+    }
+
+    .hr-block {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1 1 30%;
+        min-width: 250px;
+
+        .icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--primary-color);
+            border-radius: 50%;
+            padding: 0.6rem;
+
+            .icon {
+                width: 18px;
+                height: 18px;
+                color: var(--primary-color);
+            }
+        }
+
+        div {
+            display: flex;
+            flex-direction: column;
+
+            span {
+                font-size: 1.1rem;
+                color: var(--primary-color);
+                font-weight: 700;
+            }
+
+            strong {
+                font-size: 1.2rem;
+                color: #000;
+            }
+
+            p {
+                font-size: 0.89rem;
+                color: #000;
+                margin: 0;
+                line-height: 1.4;
+            }
+        }
+
+        .divider {
+            color: #aaa;
+            font-size: 1.5rem;
+        }
+    }
+}
+
+/* Tablet View */
+@media (max-width: 1024px) {
+    .hr-contact {
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+
+        .hr-block {
+            width: 100%;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+
+            div {
+                margin-left: 1rem;
+            }
+        }
+    }
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .hr-contact {
+        padding: 1.5rem 5%;
+        gap: 1.5rem;
+
+        .hr-block {
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+
+            div {
+                margin-left: 0;
+            }
+
+            p {
+                font-size: 0.85rem;
+            }
+
+            strong {
+                font-size: 1rem;
+            }
+
+            span {
+                font-size: 1rem;
+            }
+        }
+    }
+}

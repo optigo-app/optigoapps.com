@@ -1,0 +1,188 @@
+.about-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding: 4rem 2rem;
+    background: #f9f9f9;
+    margin-top: 3rem;
+
+    @media (max-width: 500px) {
+        padding: 3rem 1rem;
+    }
+
+    .about-card {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+
+        @media (max-width: 500px) {
+            padding: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            // color: #cc0000;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+
+            strong {
+                font-weight: 600;
+                color: #222;
+            }
+        }
+
+        &:hover {
+            transform: translateY(-4px);
+        }
+    }
+
+    .orail {
+        border-left: 6px solid var(--primary-color);
+    }
+
+    .optigo {
+        border-left: 6px solid var(--primary-color);
+    }
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+
+        .about-card {
+            flex: 1;
+        }
+    }
+}
+
+.about-benefits-bullets {
+    margin-top: 3rem;
+    padding: 4rem 2rem;
+    border-radius: 15px;
+
+    @media (max-width: 500px) {
+        padding: 1rem;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    &__title {
+        font-size: 2rem;
+        font-weight: 600;
+        // color: #4e2a84;
+        color: var(--primary-color);
+    }
+
+    &__view-all {
+        background: none;
+        border: none;
+        // color: #4e2a84;
+        color: var(--primary-color);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .benefits-bullets__arrow {
+            margin-left: 6px;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); // default: 3 cards
+        gap: 1.5rem;
+
+        @media (max-width: 1000px) {
+            grid-template-columns: repeat(2, 1fr); // 2 cards
+        }
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr; // 1 card
+        }
+    }
+
+    .about-bullet-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        transition: transform 0.3s ease;
+
+        &:hover {
+            transform: translateY(-4px);
+            background: var(--primary-background-hover);
+        }
+
+        &__icon {
+            font-size: 2rem;
+        }
+
+        &__title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        &__description {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        &__list {
+            padding-top: 1.5rem;
+            list-style-type: none;
+
+            li {
+                font-size: 0.95rem;
+                color: #444;
+                margin-bottom: 0.5rem;
+
+                &::marker {
+                    // color: #4e2a84;
+                    color: var(--primary-color);
+                }
+            }
+        }
+
+        &__link {
+            margin-top: auto;
+            font-weight: 500;
+            // color: #4e2a84;
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.95rem;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+}

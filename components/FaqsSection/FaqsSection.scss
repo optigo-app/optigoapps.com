@@ -1,0 +1,121 @@
+.faqsec-wrapper {
+    padding: 4rem 1rem;
+    background-color: #fff;
+}
+
+.faqsec-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #0a1e32;
+}
+
+.faqsec-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    @media (max-width: 768px) {
+        font-size: 1.7rem;
+    }
+
+    @media (max-width: 500px) {
+        text-align: left;
+        line-height: 1.3;
+        margin-bottom: 1.5rem;
+    }
+}
+
+.faqsec-category {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    // color: #7c3aed;
+    color: var(--primary-color);
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+
+    @media (max-width: 500px) {
+        font-size: 1.1rem;
+    }
+}
+
+.faqsec-item {
+    background-color: #f5f5f5;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.open {
+        background-color: #f0f0f0;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+}
+
+.faqsec-question {
+    font-weight: 600;
+    padding: 1rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // border-left: 4px solid #7c3aed;
+    border-left: 4px solid var(--primary-color);
+
+    @media (max-width: 500px) {
+        font-size: 15px;
+    }
+}
+
+.faqsec-answer-wrapper {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease-in-out;
+}
+
+.faqsec-item.open .faqsec-answer-wrapper {
+    max-height: 1000px; // adjust as needed to fit your tallest content
+}
+
+.faqsec-answer {
+    padding: 1rem 1rem;
+    font-size: 0.95rem;
+    color: #444;
+    // border-top: 1px solid #ddd;
+    border: 1px solid #dadada;
+    background-color: #fff;
+
+    @media (max-width: 500px) {
+        font-size: 15px;
+    }
+}
+
+.arrow {
+    font-size: 1.45rem;
+    line-height: 1;
+    padding-left: 1rem;
+}
+
+.faqsec-btn-wrapper {
+    text-align: center;
+
+    .faqsec-btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        // color: #5f00ba;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: 0.3s ease;
+        cursor: pointer;
+
+        &:hover {
+            // background-color: #5f00ba;
+            background: var(--primary-background);
+            color: #fff;
+        }
+    }
+}

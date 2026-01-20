@@ -1,0 +1,115 @@
+.blog-landing-page {
+    .blog-hero-banner {
+        position: relative; // make it a positioning context
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4rem 2rem;
+        border-radius: 1rem;
+        gap: 2rem;
+        width: 100%;
+        height: 400px;
+        overflow: visible;
+
+        @media (max-width: 1350px) {
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            height: auto;
+        }
+
+        .hero-banner-content {
+            flex: 1;
+            max-width: 600px;
+            margin-left: 4rem;
+
+            @media (max-width: 1350px) {
+                margin-left: 0;
+            }
+
+            .breadcrumb {
+                color: #000;
+                font-size: 46px;
+                font-weight: 600;
+                letter-spacing: 1.5px;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .search-overlay-form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            position: absolute;
+            width: 90%;
+            bottom: -25px;
+            left: 76px;
+        }
+
+        .search-overlay-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-overlay-search-icon {
+            position: absolute;
+            left: 1rem;
+            bottom: 20px;
+            width: 20px;
+            height: 20px;
+            color: #666;
+            z-index: 1;
+        }
+
+        .search-overlay-input {
+            width: 100%;
+            padding: 1.1rem 1rem 1.1rem 3rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            border-radius: 8px;
+            background-color: white;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+            &:focus {
+                outline: none;
+                border-color: #7c3aed;
+                box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+            }
+
+            &::placeholder {
+                color: #999;
+                font-weight: 600;
+                font-size: 18px;
+                margin-top: 2px;
+            }
+        }
+
+        .search-overlay-submit-btn {
+            // background-color: #460daf;
+            background-color: #fff;
+            // color: white;
+            color: #460daf;
+            border: 1px solid #460daf;
+            padding: 1rem 3rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+
+            &:hover {
+                background-color: #460daf;
+                color: white;
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+            }
+        }
+    }
+}

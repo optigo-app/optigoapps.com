@@ -1,0 +1,115 @@
+.erp-whole-summary-container-1 {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    background-color: #fafafa;
+    color: #333;
+    border-radius: 1rem;
+    margin-top: 3rem;
+}
+
+.erp-title-1 {
+    font-size: 2.5rem;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.erp-subtitle-1 {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+
+    @media (max-width: 500px) {
+        font-size: 1rem;
+    }
+}
+
+.erp_section_main-1 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+
+    .erp-section-1 {
+        width: calc(50% - 1rem);
+        background-color: #fff;
+        border-left: 6px solid #7c3aed;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease-in-out;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title-1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #7c3aed;
+
+            @media (max-width: 768px) {
+                font-size: 1.4rem;
+            }
+        }
+
+        .section-points-1 {
+            list-style: none;
+            padding-left: 0;
+
+            @media (max-width: 768px) {
+                font-size: 0.9rem;
+            }
+
+            li {
+                margin-bottom: 0.6rem;
+                padding-left: 1.5rem;
+                position: relative;
+                line-height: 1.6;
+
+                &::before {
+                    content: "✔";
+                    position: absolute;
+                    left: 0;
+                    color: #28a745;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .erp_section_main-1 {
+        flex-direction: column;
+    }
+
+    .erp-section-1 {
+        width: 100%;
+    }
+}
+
+
+
+@media screen and (max-width: 768px) {
+    .erp-title-1 {
+        font-size: 1.75rem;
+        text-align: left;
+    }
+
+    .section-title-1 {
+        font-size: 1.3rem;
+    }
+
+    .erp-section-1 {
+        padding: 1rem;
+    }
+}

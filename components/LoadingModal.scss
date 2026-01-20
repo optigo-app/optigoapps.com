@@ -1,0 +1,21 @@
+@keyframes colorShift {
+    0% {
+        stroke: #b2069b;
+    }
+
+    33% {
+        stroke: #3909c2;
+    }
+
+    66% {
+        stroke: #ffce00;
+    }
+
+    100% {
+        stroke: #b2069b;
+    }
+}
+
+.colorful-spinner {
+    animation: colorShift 2s linear infinite;
+}

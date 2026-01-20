@@ -1,0 +1,155 @@
+.smr_brandsComponentsDiv {
+
+    margin-top: 3rem;
+
+    .smr_brandsCompoents {
+        font-size: clamp(1.5rem, 4vw, 1.7rem);
+        font-weight: 500 !important;
+        text-align: center;
+        text-transform: capitalize;
+        line-height: 1.3;
+        margin: 3rem 0 2rem;
+        padding: 2% 0;
+        letter-spacing: 0.5px;
+
+        @media (max-width: 768px) {
+            margin: 2rem 0;
+            padding: 1.5rem 0;
+        }
+    }
+
+    .brand_content_div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        @media (max-width: 700px) {
+            flex-direction: column;
+        }
+
+        .brand_title {
+            display: flex;
+            flex-direction: column;
+
+            .brand_section_tag {
+                color: var(--primary-color);
+                text-transform: uppercase;
+                font-size: clamp(0.7rem, 1.5vw, 0.9375rem);
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                letter-spacing: 2.5px;
+                line-height: 1.4;
+            }
+
+            .brand_section_title {
+                font-size: clamp(1.5rem, 4.5vw, 2rem);
+                font-weight: 600;
+                color: #1a1a1a;
+                margin: 0;
+                line-height: 1.3;
+                flex: 1;
+                letter-spacing: -0.5px;
+
+                @media (max-width: 768px) {
+                    margin-top: 0.5rem;
+                }
+            }
+        }
+
+        .brand_see_customers {
+            margin-top: 1.5rem;
+            width: 100%;
+            text-align: center;
+
+            @media (min-width: 701px) {
+                margin-top: 0;
+                width: auto;
+                text-align: right;
+            }
+
+            .brand_btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.6rem 1.6rem;
+                background-color: transparent;
+                border: 1px solid var(--primary-color);
+                border-radius: 8px;
+                font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+                font-weight: 500;
+                color: var(--primary-color);
+                cursor: pointer;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                white-space: nowrap;
+                width: 100%;
+                max-width: 280px;
+                margin: 0 auto;
+
+                @media (min-width: 701px) {
+                    width: auto;
+                    margin: 0;
+                    padding: 0.65rem 1.8rem;
+                }
+
+                &:hover {
+                    background: var(--primary-background);
+                    border-color: transparent;
+                    color: white;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(108, 40, 217, 0.2);
+                }
+
+                &:active {
+                    transform: translateY(0);
+                    box-shadow: 0 2px 6px rgba(108, 40, 217, 0.15);
+                }
+            }
+        }
+    }
+
+    .brand-contents {
+        max-width: 80%;
+        margin-block: 1rem;
+
+        @media (max-width: 700px) {
+            max-width: 100%;
+            text-align: justify;
+        }
+
+        p {
+            font-size: 15.5px;
+
+            @media (max-width: 700px) {
+                font-size: 13px;
+            }
+        }
+    }
+
+    .brand_title_1 {
+        margin-block: 1.8rem;
+        font-size: 30px;
+        font-weight: 600;
+
+        @media (max-width: 700px) {
+            font-size: 20px;
+        }
+    }
+
+    .smr_affilitionImg1 {
+        max-width: 300px;
+        object-fit: contain;
+    }
+
+    .brandsComponentClass {
+        margin-bottom: -10%;
+    }
+
+
+    @media (min-width: 320px) and (max-width: 768px) {
+        .smr_brandsCompoents {
+            margin-bottom: 20px !important;
+        }
+
+    }
+}

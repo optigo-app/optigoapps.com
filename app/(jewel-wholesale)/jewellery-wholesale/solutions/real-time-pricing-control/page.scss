@@ -1,0 +1,108 @@
+.smart-pricing-grid {
+    padding: 4rem 2rem;
+    background: #f7f9fc;
+    margin-top: 3rem;
+
+    @media (max-width: 768px) {
+        padding: 2rem 1rem;
+    }
+
+    .main-heading {
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 0.75rem;
+        color: #1a1a1a;
+
+        @media (max-width: 768px) {
+            font-size: 1.8rem;
+            text-align: left;
+        }
+    }
+
+    .main-description {
+        text-align: center;
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        color: #444;
+
+        @media (max-width: 768px) {
+            font-size: 1rem;
+            text-align: left;
+        }
+    }
+
+    .feature-pair {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
+    }
+
+    .feature-card {
+        flex: 1;
+        min-width: 300px;
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        transition: 0.3s ease;
+
+        @media (max-width: 768px) {
+            padding: 1.5rem 1.2rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: #2e3a59;
+
+            @media (max-width: 768px) {
+                font-size: 1.3rem;
+            }
+        }
+
+        .feature-desc {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 1rem;
+
+            @media (max-width: 768px) {
+                font-size: 0.9rem;
+            }
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+
+            li {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 0.7rem;
+                color: #333;
+
+                @media (max-width: 768px) {
+                    font-size: 0.9rem;
+                }
+
+                .icon {
+                    color: #228b22;
+                    margin-right: 0.5rem;
+                    flex-shrink: 0;
+                    margin-top: 0.2rem;
+                }
+            }
+        }
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        }
+    }
+}

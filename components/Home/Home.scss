@@ -1,0 +1,11 @@
+.mainHomeSection {
+    max-width: 105rem;
+    margin: 0 auto;
+}
+
+@media (max-width: 1750px) {
+    .mainHomeSection {
+        max-width: 94%;
+        margin: 0 auto;
+    }
+}

@@ -1,0 +1,115 @@
+.header_main {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.2;
+    flex: 1;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+}
+
+.container {
+    display: flex;
+    min-height: 100%;
+    min-width: 100%;
+    gap: 10px;
+    // background-color: #f5f5f5;
+}
+
+.tab-view {
+    width: 300px; // Increased width to accommodate description and link
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #bdbdbd;
+    display: flex;
+    flex: 1 40%;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 5px;
+}
+
+.tab {
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #bdbdbd;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+
+    &.active {
+        background-color: #7c3aed;
+        color: #fff;
+
+        .tab-title,
+        .tab-description {
+            color: #fff;
+            max-width: 72%;
+        }
+
+        .tab-link {
+            border: 1px solid #fff;
+            color: #fff;
+        }
+    }
+}
+
+.tab-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.tab-description {
+    font-size: 0.9rem;
+    margin: 0;
+    max-width: 72%;
+}
+
+.tab-link {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    color: black;
+    border: 1px solid gray;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.banner {
+    flex: 1 80%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fff;
+    text-align: center;
+}
+
+.banner-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tab-desc-div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .tab-description {
+        flex: 1 70%;
+    }
+}

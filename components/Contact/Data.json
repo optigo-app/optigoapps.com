@@ -1,0 +1,34 @@
+{
+  "countries": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Germany",
+    "France",
+    "Italy",
+    "Spain",
+    "India",
+    "China",
+    "Japan",
+    "Australia",
+    "Brazil",
+    "Mexico",
+    "South Africa",
+    "Russia"
+  ],
+  "industries": [
+    "Jewellery Retail Stores",
+    "Multi-Location Chain Stores",
+    "Franchise Showrooms",
+    "Boutique Jewellery Brands",
+    "Jewellery Distributors",
+    "Domestic/International Wholesalers",
+    "Multi-Branch Wholesalers",
+    "Diamond Jewellery Manufacturing",
+    "Gold Jewellery Manufacturing",
+    "Handmade Jewellery",
+    "CZ Manufacturing",
+    "Kundan/Jadau Manufacturing",
+    "Bangles Manufacturing"
+  ]
+}
