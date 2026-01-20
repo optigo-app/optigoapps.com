@@ -9,7 +9,7 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'optigoapps.com',
-                pathname: '/**', // match all paths under the domain
+                pathname: '/**', 
             },
         ],
     },
