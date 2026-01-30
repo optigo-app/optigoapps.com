@@ -28,10 +28,11 @@ const Careerinfo = () => {
     const handleUrlNavigation = useHandleUrlNavigation();
 
     const router = useRouter();
-    const departments = [];
-    const getDept = jobData?.filter((job) => {
-        departments.push(job.title);
-    })
+    // let departments = [];
+    // const getDept = jobData?.filter((job) => {
+    //     departments.push(job.title);
+    // })
+    const departments = [...new Set(jobData?.map(job => job.groupname))];
 
     const scrollToJobs = () => {
         jobListRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,14 +44,15 @@ const Careerinfo = () => {
         const handler = setTimeout(() => {
             setDebouncedLocation(location);
             setLoading(false);
-        }, 800);
+        }, 500);
 
         return () => clearTimeout(handler);
-        getDept;
+        // getDept;
     }, [location]);
 
     const filteredJobs = jobData.filter(job => {
-        const matchesDepartment = selectedDepartment ? job.title === selectedDepartment : true;
+        // const matchesDepartment = selectedDepartment ? job.title === selectedDepartment : true;
+        const matchesDepartment = selectedDepartment ? job.groupname === selectedDepartment : true;
         const matchesLocation = debouncedLocation
             ? job.location.toLowerCase().includes(debouncedLocation.toLowerCase())
             : true;
@@ -75,9 +77,9 @@ const Careerinfo = () => {
         }
     };
 
-    const handleLocationChange = (e) => {
-        setLocation(e.target.value);
-    };
+    // const handleLocationChange = (e) => {
+    //     setLocation(e.target.value);
+    // };
 
     const handleDepartmentChange = (e) => {
         setSelectedDepartment(e.target.value);
@@ -87,15 +89,15 @@ const Careerinfo = () => {
         }, 1000);
     };
 
-    const handleFilterSubmit = () => {
-        setSelectedDepartment("");
-        setLocation("");
-        // setCurrentPage(1);
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    };
+    // const handleFilterSubmit = () => {
+    //     setSelectedDepartment("");
+    //     setLocation("");
+    //     // setCurrentPage(1);
+    //     setLoading(true);
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 1000);
+    // };
 
     return (
         <div className="optigoapps-careers">
@@ -161,7 +163,7 @@ const Careerinfo = () => {
                     </div>
                 </div>
 
-                <div className="dropdown-item">
+                {/* <div className="dropdown-item">
                     <label htmlFor="location-input">Enter your Location:</label>
                     <input
                         id="location-input"
@@ -170,13 +172,13 @@ const Careerinfo = () => {
                         value={location}
                         onChange={handleLocationChange}
                     />
-                </div>
+                </div> */}
 
-                {(selectedDepartment !== "" || location !== "") && (
+                {/* {(selectedDepartment !== "" || location !== "") && (
                     <div className="dropdown-item button-container">
                         <button onClick={handleFilterSubmit}>Reset Filter</button>
                     </div>
-                )}
+                )} */}
             </div>
 
 
@@ -196,7 +198,22 @@ const Careerinfo = () => {
                             <>
                                 <div className="job-grid">
                                     {filteredJobs.map((job) => (
-                                        <div className="job-card-modern" key={job.id}>
+                                        <Link 
+                                            className="job-card-modern" 
+                                            key={job.id}
+                                            href={`/career/${job.title
+                                                .toLowerCase()
+                                                .replace(/\s+/g, '-')
+                                                .replace(/[^\w-]/g, '')}`}
+                                            onClick={(e) =>
+                                                handleUrlNavigation(e,
+                                                    `/career/${job.title
+                                                        .toLowerCase()
+                                                        .replace(/\s+/g, '-')
+                                                        .replace(/[^\w-]/g, '')}`
+                                                )
+                                            }
+                                        >
                                             <div className="job-info">
                                                 <h3 className="job-title">{job.title}</h3>
                                                 <div className="job-details">
@@ -215,25 +232,28 @@ const Careerinfo = () => {
                                                 </div>
                                             </div>
                                             <div className="job-action">
-                                                <Link
+                                                {/* <Link
                                                     className="apply-now"
                                                     href={`/career/${job.title
                                                         .toLowerCase()
                                                         .replace(/\s+/g, '-')
                                                         .replace(/[^\w-]/g, '')}`}
-                                                    onClick={(e) =>
-                                                        handleUrlNavigation(e,
-                                                            `/career/${job.title
-                                                                .toLowerCase()
-                                                                .replace(/\s+/g, '-')
-                                                                .replace(/[^\w-]/g, '')}`
-                                                        )
-                                                    }
+                                                    // onClick={(e) =>
+                                                    //     handleUrlNavigation(e,
+                                                    //         `/career/${job.title
+                                                    //             .toLowerCase()
+                                                    //             .replace(/\s+/g, '-')
+                                                    //             .replace(/[^\w-]/g, '')}`
+                                                    //     )
+                                                    // }
                                                 >
                                                     Apply Now <span className="arrow"><ChevronRight /></span>
-                                                </Link>
+                                                </Link> */}
+                                                  <span className="apply-now">
+                                                        Apply Now <span className="arrow"><ChevronRight /></span>
+                                                </span>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </>

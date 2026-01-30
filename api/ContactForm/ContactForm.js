@@ -4,7 +4,7 @@ export const ContactForm = async (formData) => {
     try {
         const body = {
             "con": "{\"id\":\"\",\"mode\":\"contact-us\",\"appuserid\":\"admin@hs.com\"}",
-            "p": `{\"FirstName\":\"${formData.firstName}\",\"LastName\":\"${formData.lastName}\",\"Email\":\"${formData.email}\",\"CompanyName\":\"${formData.companyName}\",\"PhoneNo\":\"+${formData.mobileNoCode}-${formData.mobile}\",\"Country\":\"${formData.country}\",\"Industry\":\"${formData.industry}\"}`,
+            "p": `{\"FirstName\":\"${formData.firstName}\",\"LastName\":\"${formData.lastName}\",\"Email\":\"${formData.email}\",\"CompanyName\":\"${formData.companyName}\",\"PhoneNo\":\"+${formData.mobileNoCode}-${formData.mobile}\",\"Country\":\"${formData.country}\",\"Industry\":\"${formData.industry}\",\"Region\":\"${formData.region}\"}`,
             "f": "Optigo ( Contact )"
         }
 
