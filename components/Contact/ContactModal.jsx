@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { ChevronDown, X, Loader2 } from "lucide-react";
 import toast from 'react-hot-toast';
 import { CustEmailSending } from '@/api/EmailApi/CustomEmailSending';
+import { getUserIpAndLocation } from '@/utils/getUserLocation';
 
 const ContactModal = ({ isOpen, onClose }) => {
     // --- State Management ---
@@ -147,7 +148,7 @@ const ContactModal = ({ isOpen, onClose }) => {
 
     const ensureArray = (val) => Array.isArray(val) ? val : [val];
 
-    const buildEmailData = (type, formData) => {
+    const buildEmailData = (type, formData, locationData = null) => {
         const selectedCountry = countryCodes.find(c => c.code === formData.country)
         if (type === "sales") {
             return {
@@ -231,6 +232,25 @@ const ContactModal = ({ isOpen, onClose }) => {
                                                         ${formData.industry}
                                                         </td>
                                                     </tr>
+                                                    ${locationData ? `
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">IP Address</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.ip || "N/A"}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Latitude</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.latitude ?? "N/A"}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Longitude</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.longitude ?? "N/A"}
+                                                        </td>
+                                                    </tr>` : ""}
                                                 </table>
                                             </td>
                                         </tr>
@@ -370,6 +390,7 @@ const ContactModal = ({ isOpen, onClose }) => {
                         </table>
                     </body>
                 `,
+                otherdata: JSON.stringify({firstName:formData.firstName, lastName: formData.lastName,email: formData.email,companyName: formData.companyName,industry: formData.industry,region: formData.region,country: selectedCountry?.label || "",mobile: `+${selectedCountry?.phone || "91"} ${formData.mobile || ""}`}),
                 mode: "OPTIGO_CONTECT_AND_CARRER",
                 ufcc: isLocal ? "orail25" : "test74",
                 templateNo: 0
@@ -445,10 +466,11 @@ const ContactModal = ({ isOpen, onClose }) => {
         if (validate()) {
             setIsLoading(true);
             try {
-                const response = await ContactForm(formData);
-                if (response?.Data?.rd?.[0]?.stat === 1) {
+                // const response = await ContactForm(formData);
+                // if (response?.Data?.rd?.[0]?.stat === 1) {
                     // toast.success(response?.Data?.rd?.[0]?.stat_msg);
-                    const emailData = buildEmailData("sales", formData);
+                    const locationData = await getUserIpAndLocation();
+                    const emailData = buildEmailData("sales", formData, locationData);
                     // const emailResponse = await EmailSending({ emailData });
                     const emailResponse = await CustEmailSending({ emailData });
 
@@ -462,9 +484,9 @@ const ContactModal = ({ isOpen, onClose }) => {
                     } else {
                         toast.error(emailResponse?.message || "Error sending email");
                     }
-                } else {
-                    toast.error(response?.Data?.rd?.[0]?.stat_msg || "Error submitting form");
-                }
+                // } else {
+                //     toast.error(response?.Data?.rd?.[0]?.stat_msg || "Error submitting form");
+                // }
             } catch (error) {
                 console.error("Error:", error);
                 toast.error("An unexpected error occurred");

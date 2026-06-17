@@ -10,6 +10,9 @@ import { ChevronDown } from "lucide-react";
 import toast from 'react-hot-toast';
 import LoadingModal from '../LoadingModal';
 import { CustEmailSending } from '@/api/EmailApi/CustomEmailSending';
+import ReCAPTCHA from "react-google-recaptcha";
+import { Recaptcha } from '@/api/RecaptchaApi/recaptcha';
+import { getUserIpAndLocation } from '@/utils/getUserLocation';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -31,6 +34,9 @@ const Contact = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
+    const [captchaToken, setCaptchaToken] = useState(null);
+    const recaptchaRef = useRef();
+
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [activeIndex, setActiveIndex] = useState(-1);
@@ -45,7 +51,7 @@ const Contact = () => {
         if (isSuccess) {
             const timer = setTimeout(() => {
                 setIsSuccess(false);
-            }, 4000);
+            }, 8000);
 
             return () => clearTimeout(timer);
         }
@@ -90,7 +96,7 @@ const Contact = () => {
 
     const ensureArray = (val) => Array.isArray(val) ? val : [val];
 
-    const buildEmailData = (type, formData) => {
+    const buildEmailData = (type, formData, locationData = null) => {
         const selectedCountry = countryCodes.find(c => c.code === formData.country)
         if (type === "sales") {
             return {
@@ -175,6 +181,25 @@ const Contact = () => {
                                                         ${formData.industry}
                                                         </td>
                                                     </tr>
+                                                    ${locationData ? `
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">IP Address</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.ip || "N/A"}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Latitude</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.latitude ?? "N/A"}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Longitude</td>
+                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
+                                                        ${locationData.longitude ?? "N/A"}
+                                                        </td>
+                                                    </tr>` : ""}
                                                 </table>
                                             </td>
                                         </tr>
@@ -314,6 +339,7 @@ const Contact = () => {
                         </table>
                     </body>
                 `,
+                otherdata: JSON.stringify({firstName:formData.firstName, lastName: formData.lastName,email: formData.email,companyName: formData.companyName,industry: formData.industry,region: formData.region,country: selectedCountry?.label || "",mobile: `+${selectedCountry?.phone || "91"} ${formData.mobile || ""}`}),
                 mode: "OPTIGO_CONTECT_AND_CARRER",
                 ufcc: isLocal ? "orail25" : "test74",
                 templateNo: 0
@@ -341,6 +367,7 @@ const Contact = () => {
 
     const validate = () => {
         const newErrors = {};
+
         const { firstName, lastName, email, companyName, mobile, country, industry, region } = formData;
         if (!firstName?.trim()) newErrors.firstName = "First Name is required";
         if (!lastName?.trim()) newErrors.lastName = "Last Name is required";
@@ -367,6 +394,9 @@ const Contact = () => {
         if (!industry?.trim()) newErrors.industry = "Business Type is required";
         if (!region?.trim()) newErrors.region = "City is required";
 
+        // if (!captchaToken) {
+        //     newErrors.captcha = "Please verify that you are not a robot";
+        // }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     }
@@ -410,6 +440,10 @@ const Contact = () => {
         setErrors(prev => ({ ...prev, [name]: '' }));
     }
 
+    const handleCaptchaChange = (token) => {
+        setCaptchaToken(token);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLoading) return;
@@ -417,11 +451,18 @@ const Contact = () => {
         if (validate()) {
             setIsLoading(true);
             try {
-                const response = await ContactForm(formData);
-                if (response?.Data?.rd?.[0]?.stat === 1) {
+                // const response = await ContactForm(formData);
+                // if (response?.Data?.rd?.[0]?.stat === 1) {
                     // toast.success(response?.Data?.rd?.[0]?.stat_msg);
-                    const emailData = buildEmailData("sales", formData);
-                    const emailResponse = await CustEmailSending({ emailData });
+                    // const isValid = await Recaptcha(captchaToken);
+                    // const newErrors = {};
+                    // if(!isValid) {
+                    //     newErrors.captcha = "Captcha verification failed. Please try again.";
+                    // }
+
+                    const locationData = await getUserIpAndLocation();
+                    const emailData = buildEmailData("sales", formData, locationData);
+                    const emailResponse = await CustEmailSending({ emailData});
 
                     if (emailResponse?.status === 200) {
                         // toast.success(emailResponse?.message);
@@ -436,15 +477,19 @@ const Contact = () => {
                             industry: '',
                             region: ''
                         });
+
+                        // setCaptchaToken(null);
+                        // recaptchaRef.current.reset();
+
                         setErrors({});
                         setMaxPhoneLength("");
                         setIsSuccess(true);
                     } else {
                         toast.error(emailResponse?.message || "Error while sending email");
                     }
-                } else {
-                    toast.error(response?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
-                }
+                // } else {
+                //     toast.error(response?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
+                // }
             } catch (error) {
                 console.error("Error during form submission:", error);
                 toast.error("An unexpected error occurred");
@@ -693,6 +738,16 @@ const Contact = () => {
                             </small>
                         )}
                     </div>
+                    {/* <div className="form-group full-width">
+                        <ReCAPTCHA
+                            ref={recaptchaRef}
+                            sitekey={'6LeiDcYsAAAAANDAGyZ3K0S79WOS5RZptGZB_ZLq'}
+                            onChange={handleCaptchaChange}
+                        />
+                        {errors.captcha && (
+                            <span className="error-message">{errors.captcha}</span>
+                        )}
+                    </div> */}
                     <div className="form-group full-width"
                         style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
                     >

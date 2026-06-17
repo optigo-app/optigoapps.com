@@ -32,23 +32,22 @@ export const CustEmailSending = async ({ attachments, emailData }) => {
     if (emailData?.message) formData.append('cust_message', emailData.cust_message);
     if (emailData?.htmlTemplate) formData.append('htmlTemplate', emailData.htmlTemplate);
     if (emailData?.htmlTemplate) formData.append('cust_htmlTemplate', emailData.cust_htmlTemplate);
-    if (emailData?.mode) formData.append('mode', emailData.mode);
-    if (emailData?.ufcc) formData.append('ufcc', emailData.ufcc);
-    if (emailData?.templateNo !== undefined || emailData?.templateNo !== null || emailData?.templateNo !== "") formData.append('templateNo', emailData.templateNo);
+    if (emailData?.otherdata) formData.append('otherdata', emailData.otherdata);
+    // if (emailData?.mode) formData.append('mode', emailData.mode);
+    // if (emailData?.ufcc) formData.append('ufcc', emailData.ufcc);
+    // if (emailData?.templateNo !== undefined || emailData?.templateNo !== null || emailData?.templateNo !== "") formData.append('templateNo', emailData.templateNo);
 
     let APIURL =
         isLocal
-            ? 'http://newnextjs.web/api/customsendemail'
-            :
-            'https://apilx.optigoapps.com/api/customsendemail';
-
+            ? 'http://192.168.0.71:3000/api/connect'
+            :'https://metabase.optigoapps.com/api/connect';
     try {
         const response = await axios.post(APIURL, formData, {
             headers: {
                 "Accept": "",
                 'Content-Type': 'multipart/form-data',
-                'Yearcode': isLocal ? 'e3tuemVufX17ezIwfX17e29yYWlsMjV9fXt7b3JhaWwyNX19' : 'e3tsaXZlLm9wdGlnb2FwcHMuY29tfX17ezIwfX17e3Rlc3Q3NH19e3t0ZXN0NzR9fQ==',
-                'sv': isLocal ? '0' : '1'
+                // 'Yearcode': isLocal ? 'e3tuemVufX17ezIwfX17e29yYWlsMjV9fXt7b3JhaWwyNX19' : 'e3tsaXZlLm9wdGlnb2FwcHMuY29tfX17ezIwfX17e3Rlc3Q3NH19e3t0ZXN0NzR9fQ==',
+                // 'sv': isLocal ? '0' : '1'
             },
         });
         return response.data;

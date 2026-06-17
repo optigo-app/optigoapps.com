@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import LoadingModal from '../LoadingModal';
 import './CareerForm.scss';
 import { countryCodes } from '@/public/CountryCodes';
@@ -97,50 +97,108 @@ const CareerForm = () => {
         };
     }, []);
 
+    const sortedData = useMemo(() => [...jobData].sort((a, b) => (b.id % 2) - (a.id % 2) || a.id - b.id), [jobData]);
+
     const handleChange = (e) => {
         const { name, type, checked, value } = e.target;
+
         setFormData((prev) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
 
-        if (name === "mobileCode") {
-            const country = countryCodes.find((c) => c.code === value);
-            let phoneCode = '';
-            let min = 1;
-            let max = 15; // Default max length
+        // if (name === "mobileCode") {
+        //     const country = countryCodes.find((c) => c.code === value);
+        //     let phoneCode = '';
+        //     let min = 1;
+        //     let max = 10;
 
-            if (country) {
-                phoneCode = country.phone;
-                if (Array.isArray(country.phoneLength)) {
-                    min = Math.min(...country.phoneLength);
-                    max = Math.max(...country.phoneLength);
-                } else if (country.phoneLength) {
-                    min = country.phoneLength;
-                    max = country.phoneLength;
-                } else if (country.min && country.max) {
-                    min = country.min;
-                    max = country.max;
+        //     if (country) {
+        //         phoneCode = country.phone;
+        //         if (Array.isArray(country.phoneLength)) {
+        //             min = Math.min(...country.phoneLength);
+        //             max = Math.max(...country.phoneLength);
+        //         } else if (country.phoneLength) {
+        //             min = country.phoneLength;
+        //             max = country.phoneLength;
+        //         } else if (country.min && country.max) {
+        //             min = country.min;
+        //             max = country.max;
+        //         }
+        //     }
+
+        //     setMinLen(min);
+        //     setMaxLen(max);
+
+        //     setFormData((prev) => ({
+        //         ...prev,
+        //         mobileCode: value,
+        //         mobileNoCode: phoneCode
+        //     }));
+        // }
+
+        // if (name === "mobile") {
+        //     if (value.replace(/\D/g, "").length <= maxLen) {
+        //         setFormData((prev) => ({ ...prev, mobile: value }));
+        //     }
+        // }
+
+        setErrors((prev) => {
+            const updatedErrors = { ...prev };
+
+            const messages = {
+                firstName: "Please enter your first name",
+                lastName: "Please enter your last name",
+                gender: "Please select your gender",
+                email: "Please enter your email",
+                mobile: "Please enter your mobile number",
+                years: "Please enter your experience in years or months",
+                currentLocation: "Please enter your current location",
+                department: "Please select your department",
+                joinDays: "Please select joining date"
+            };
+
+            if (!value || value.trim() === "") {
+
+                if (messages[name]) {
+                    updatedErrors[name] = messages[name];
+                }
+            } else if (name === "email") {
+                if(!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
+                    updatedErrors.email = "Please enter a valid email address";
+                } else {
+                    delete updatedErrors.email;
+                }
+            }  else if (name === "mobile") {
+                if (!/^\d+$/.test(value)) {
+                    updatedErrors.mobile = "Mobile number must contain only numbers";
+                } else if (value.length < maxLen) {
+                    updatedErrors.mobile = "Mobile number must be 10 digits";
+                } else {
+                    delete updatedErrors.mobile;
+                }
+            } else if (name === "joinDays") {
+                const selectedDate = new Date(value);
+                const today = new Date();
+        
+                // normalize time for accurate comparison
+                selectedDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+        
+                if (selectedDate < today) {
+                    updatedErrors.joinDays = "Previous date id not allowed";
+                } else {
+                    delete updatedErrors.joinDays;
                 }
             }
-
-            setMinLen(min);
-            setMaxLen(max);
-
-            setFormData((prev) => ({
-                ...prev,
-                mobileCode: value,
-                mobileNoCode: phoneCode
-            }));
-        }
-
-        if (name === "mobile") {
-            // Only allow digits up to maxLen
-            if (value.replace(/\D/g, "").length <= maxLen) {
-                setFormData((prev) => ({ ...prev, mobile: value }));
+            else if (name === "consent" && checked !== true) {
+                updatedErrors.consent = "Please accept the terms and conditions";
+            } else {
+                delete updatedErrors[name];
             }
-        }
 
+            return updatedErrors;
+        })
     };
 
     // ✅ Utility: always wrap into array
@@ -182,7 +240,7 @@ const CareerForm = () => {
                                 <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
                                 <tr>
                                     <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
-                                    <td>${formData.firstName} ${formData.middleName} ${formData.lastName}</td>
+                                    <td>${formData.firstName} ${formData.lastName}</td>
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">
                                     <td style="font-weight: 600; color: #444;">Email:</td>
@@ -194,18 +252,18 @@ const CareerForm = () => {
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">
                                     <td style="font-weight: 600; color: #444;">Phone:</td>
-                                    <td><a href="tel:${formData.mobileNoCode}${formData.mobile}" style="color: #0056d2; text-decoration: none;">+${formData.mobileNoCode}-${formData.mobile}</a></td>
+                                    <td><a href="tel:+91 ${formData.mobile}" style="color: #0056d2; text-decoration: none;">+91 ${formData.mobile}</a></td>
                                 </tr>
                                 <tr>
                                     <td style="font-weight: 600; color: #444;">Experience:</td>
                                     <td>${formData.years}</td>
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">
-                                    <td style="font-weight: 600; color: #444;">Available to Join:</td>
-                                    <td>${formData.joinDays} ${formData.joinDays === 1 ? "day" : "days"}</td>
+                                    <td style="font-weight: 600; color: #444;">Available to Join from:</td>
+                                    <td>${formData.joinDays}</td>
                                 </tr>
                                 <tr>
-                                    <td style="font-weight: 600; color: #444;">Current Location/City:</td>
+                                    <td style="font-weight: 600; color: #444;">Current City:</td>
                                     <td>${formData.currentLocation}</td>
                                 </tr>
                                 <tr style="background-color: #f9f9f9;">
@@ -258,7 +316,7 @@ const CareerForm = () => {
                                     <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
                                         <tr>
                                             <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
-                                            <td>${formData.firstName} ${formData.middleName} ${formData.lastName}</td>
+                                            <td>${formData.firstName} ${formData.lastName}</td>
                                         </tr>
                                         <tr style="background-color: #f9f9f9;">
                                             <td style="font-weight: 600; color: #444;">Email:</td>
@@ -267,7 +325,7 @@ const CareerForm = () => {
                                         <tr>
                                             <td style="font-weight: 600; color: #444;">Phone:</td>
                                             <td>
-                                                <a href="tel:${formData.mobileNoCode}${formData.mobile}" style="color: #0056d2; text-decoration: none;">+${formData.mobileNoCode}-${formData.mobile}</a>
+                                                <a href="tel:+91 ${formData.mobile}" style="color: #0056d2; text-decoration: none;">+91 ${formData.mobile}</a>
                                             </td>
                                         </tr>
                                         <tr style="background-color: #f9f9f9;">
@@ -275,12 +333,12 @@ const CareerForm = () => {
                                             <td>${formData.years}</td>
                                         </tr>
                                         <tr>
-                                            <td style="font-weight: 600; color: #444;">Location:</td>
+                                            <td style="font-weight: 600; color: #444;">Current City</td>
                                             <td>${formData.currentLocation}</td>
                                         </tr>
                                         <tr style="background-color: #f9f9f9;">
-                                            <td style="font-weight: 600; color: #444;">Available to Join:</td>
-                                            <td>${formData.joinDays} ${formData.joinDays === 1 ? "day" : "days"}</td>
+                                            <td style="font-weight: 600; color: #444;">Available to Join from:</td>
+                                            <td>${formData.joinDays}</td>
                                         </tr>
                                         <tr>
                                             <td style="font-weight: 600; color: #444;">Department:</td>
@@ -369,7 +427,7 @@ const CareerForm = () => {
 
         // --- Validations ---
         if (!firstName?.trim()) newErrors.firstName = "Please enter your first name";
-        if (!middleName?.trim()) newErrors.middleName = "Please enter your middle name";
+        // if (!middleName?.trim()) newErrors.middleName = "Please enter your middle name";
         if (!lastName?.trim()) newErrors.lastName = "Please enter your last name";
         if (!gender) newErrors.gender = "Please select your gender";
 
@@ -379,27 +437,47 @@ const CareerForm = () => {
             newErrors.email = "Please enter a valid email address";
         }
 
-        if (!mobileCode && !mobile) {
-            newErrors.mobileCode = "Please select your country code";
+        if (!mobile) {
             newErrors.mobile = "Please enter your mobile number";
-        } else {
-            if (mobileCode == "") {
-                newErrors.mobileCode = "Please select your country code";
-            }
-            if (mobile == "") {
-                newErrors.mobile = "Please enter your mobile number";
-            } else if (!/^\d+$/.test(mobile)) {
-                newErrors.mobile = "Mobile number must contain only numbers";
-            } else if (mobile.length < minLen || mobile.length > maxLen) {
-                newErrors.mobile =
-                    minLen === maxLen
-                        ? `Mobile number must be ${maxLen} digits`
-                        : `Mobile number must be between ${minLen} and ${maxLen} digits`;
-            }
+        } else if (!/^\d+$/.test(mobile)) {
+            newErrors.mobile = "Mobile number must contain only numbers";
+        } else if (mobile.length < maxLen) {
+            newErrors.mobile = "Mobile number must be 10 digits";
         }
 
+        // if (!mobileCode && !mobile) {
+        //     newErrors.mobileCode = "Please select your country code";
+        //     newErrors.mobile = "Please enter your mobile number";
+        // } else {
+        //     if (mobileCode == "") {
+        //         newErrors.mobileCode = "Please select your country code";
+        //     }
+        //     if (mobile == "") {
+        //         newErrors.mobile = "Please enter your mobile number";
+        //     } else if (!/^\d+$/.test(mobile)) {
+        //         newErrors.mobile = "Mobile number must contain only numbers";
+        //     } else if (mobile.length < minLen || mobile.length > maxLen) {
+        //         newErrors.mobile =
+        //             minLen === maxLen
+        //                 ? `Mobile number must be ${maxLen} digits`
+        //                 : `Mobile number must be between ${minLen} and ${maxLen} digits`;
+        //     }
+        // }
+
         if (!years?.trim()) newErrors.years = "Please enter your experience in years or months";
-        if (!joinDays || parseInt(joinDays) <= 0) newErrors.joinDays = "Please enter the number of days to join";
+        // if (!joinDays || parseInt(joinDays) <= 0) newErrors.joinDays = "Please enter the number of days to join";
+        if(!joinDays) {
+            newErrors.joinDays = "Please select joining date";
+        } else if (joinDays) {
+            const selectedDate = new Date(joinDays);
+            const today = new Date();
+            selectedDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            if (selectedDate < today) {
+                newErrors.joinDays = "Previous date id not allowed";
+            }
+        }
+        
         if (!currentLocation?.trim()) newErrors.currentLocation = "Please enter your current location";
         if (!department?.trim()) newErrors.department = "Please select your department";
         if (consent !== true) newErrors.consent = "Please accept the terms and conditions";
@@ -437,9 +515,9 @@ const CareerForm = () => {
             };
 
             // --- Submit Career Form ---
-            const careerForm = await CareerFormApi(updatedFormData);
+            // const careerForm = await CareerFormApi(updatedFormData);
 
-            if (careerForm?.Data?.rd?.[0]?.stat === 1) {
+            // if (careerForm?.Data?.rd?.[0]?.stat === 1) {
                 // --- Send Emails ---
                 const data = buildEmailData(updatedFormData);
                 // const hrData = buildEmailData("hr", updatedFormData);
@@ -471,9 +549,9 @@ const CareerForm = () => {
                 setResumeFile(null);
                 setErrors({});
                 setIsSuccess(true);
-            } else {
-                toast.error(careerForm?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
-            }
+            // } else {
+            //     toast.error(careerForm?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
+            // }
         } catch (error) {
             console.error("Error during form submission process:", error);
             toast.error("An unexpected error occurred.");
@@ -552,7 +630,7 @@ const CareerForm = () => {
                                 {errors.firstName && <p className="error-text">{errors.firstName}</p>}
                             </div>
 
-                            <div className="form-field">
+                            {/* <div className="form-field">
                                 <label htmlFor="middleName">Middle Name *</label>
                                 <input
                                     type="text"
@@ -562,7 +640,7 @@ const CareerForm = () => {
                                     onChange={handleChange}
                                 />
                                 {errors.middleName && <p className="error-text">{errors.middleName}</p>}
-                            </div>
+                            </div> */}
 
                             <div className="form-field">
                                 <label htmlFor="lastName">Last Name *</label>
@@ -585,10 +663,10 @@ const CareerForm = () => {
                                         value={formData.gender}
                                         onChange={handleChange}
                                     >
-                                        <option value="">Select an option</option>
+                                        <option value="">Select</option>
                                         <option>Male</option>
                                         <option>Female</option>
-                                        <option>Other</option>
+                                        {/* <option>Other</option> */}
                                     </select>
 
                                     {/* Custom arrow */}
@@ -610,11 +688,11 @@ const CareerForm = () => {
                             </div>
 
                             <div className="form-field mobile-field">
-                                <label>Mobile Phone *</label>
+                                <label>Mobile Number *</label>
                                 <div className="mobile-inputs">
-                                    <div className='mobile-input-div'>
-                                        <div className="select-wrapper-carform1" ref={dropdownRef}>
-                                            <div
+                                    {/* <div className='mobile-input-div'> */}
+                                        {/* <div className="select-wrapper-carform1" ref={dropdownRef}> */}
+                                            {/* <div
                                                 className={`custom-select-box ${errors.mobileCode ? "error" : ""}`}
                                                 onClick={() => setIsOpen(!isOpen)}
                                                 onBlur={() => {
@@ -632,9 +710,9 @@ const CareerForm = () => {
                                                 : "Select"}
 
                                                 <ChevronDown className="select-icon" size={18} />
-                                            </div>
+                                            </div> */}
 
-                                            {isOpen && (
+                                            {/* {isOpen && (
                                                 <div className="custom-dropdown-box">
                                                     <input
                                                         type="text"
@@ -718,8 +796,8 @@ const CareerForm = () => {
                                                         }
                                                     </ul>
                                                 </div>
-                                            )}
-                                            </div>
+                                            )} */}
+                                            {/* </div> */}
                                         </div>
                                     <input
                                         type="tel"
@@ -728,22 +806,22 @@ const CareerForm = () => {
                                         value={formData.mobile}
                                         maxLength={maxLen}
                                         onChange={handleChange}
-                                        placeholder="Phone number"
+                                        // placeholder="Phone number"
                                     />
-                                </div>
-                                <p style={{ marginTop: "0.5rem", color: "#555" }}>
+                                {/* </div> */}
+                                {/* <p style={{ marginTop: "0.5rem", color: "#555" }}>
                                     Max {maxLen} digits allowed for selected country
-                                </p>
-                                {errors.mobileCode && <span className="error-text">{errors.mobileCode}</span>}
+                                </p> */}
+                                {/* {errors.mobileCode && <span className="error-text">{errors.mobileCode}</span>} */}
                                 {errors.mobile && <p className="error-text">{errors.mobile}</p>}
                             </div>
 
                             <div className="form-field experience-field">
-                                <label>Work Experience (e.g., 2 Years / 12 Months) *</label>
+                                <label>Work Experience (e.g. 6 Months / 1 Year ) *</label>
                                 <div className="experience-inputs">
                                     <input
                                         type="text"
-                                        placeholder="Years"
+                                        // placeholder="Years"
                                         name='years'
                                         id="years"
                                         value={formData.years}
@@ -754,26 +832,28 @@ const CareerForm = () => {
                             </div>
 
                             <div className="form-field">
-                                <label htmlFor="joinDays">Available To Join (in days) *</label>
+                                <label htmlFor="joinDays">Available To Join From (date) *</label>
                                 <input
-                                    type="text"
+                                    type="date"
                                     name="joinDays"
                                     id="joinDays"
                                     value={formData.joinDays}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        // Allow only digits
-                                        if (/^\d*$/.test(value)) {
-                                            handleChange(e);
-                                        }
-                                    }}
-                                    placeholder="Enter number of days"
+                                    min={new Date().toISOString().split("T")[0]}
+                                    // onChange={(e) => {
+                                    //     const value = e.target.value;
+                                    //     // Allow only digits
+                                    //     if (/^\d*$/.test(value)) {
+                                    //         handleChange(e);
+                                    //     }
+                                    // }}
+                                    onChange={handleChange}
+                                    // placeholder="Enter number of days"
                                 />
                                 {errors.joinDays && <p className="error-text">{errors.joinDays}</p>}
                             </div>
 
                             <div className="form-field">
-                                <label htmlFor="currentLocation">Current Location/City *</label>
+                                <label htmlFor="currentLocation">Current City *</label>
                                 <input
                                     type="text"
                                     name="currentLocation"
@@ -805,7 +885,7 @@ const CareerForm = () => {
                                         className={errors.department ? "error" : ""}
                                     >
                                         <option value="">Select</option>
-                                        {jobData.map((job) => (
+                                        {sortedData.map((job) => (
                                             <option key={job.id} value={job.title}>
                                                 {job.title}
                                             </option>

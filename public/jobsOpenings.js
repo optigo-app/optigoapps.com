@@ -1,13 +1,14 @@
 const jobData = [
     {
         id: 1,
-        title: '.Net + ms sql developer',
+        title: '.Net + MS SQL developer',
         keywords: ["ASP.NET", "C# development", "web development", "jQuery", "front-end development", "web applications", "API integration", "software development", "Microsoft technologies", "SQL development", "database management", "T-SQL programming", "SQL Server", "ETL processes", "data integrity", "query optimization", "stored procedures", "database security", "performance tuning"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: " BCA / BE Computer / Diploma in computer / or related field.",
         experience: "1 - 3 Years",
         department: "Engineering",
         groupname: "Software development",
+        groupid: 1,
         requirements: `
             <ul>
                 <li>☑️ Write efficient, optimized, and scalable SQL queries, stored procedures, and triggers</li>
@@ -47,13 +48,14 @@ const jobData = [
     },
     {
         id: 2,
-        title: 'HR executive',
+        title: 'Human resource executive',
         keywords: ["human resources", "HR management", "employee relations", "performance management", "recruitment", "HR policies", "employee engagement", "HR administration", "talent acquisition", "HR metrics"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "Bachelor’s degree in HR",
         experience: "0 - 2 Years",
         department: "Engineering",
         groupname: "HR",
+        groupid: 7,
         requirements: `
             <ul>
                 <li>☑️ Monitor and analyze employee performance using KPIs and metrics</li>
@@ -78,13 +80,14 @@ const jobData = [
     },
     {
         id: 3,
-        title: 'Node js + ms sql developer',
+        title: 'Node js + MS SQL developer',
         keywords: ["Node js", "Node js development", "API integration", "Socket.io", "JavaScript", "Image Upload", "Microsoft technologies", "SQL development", "database management", "T-SQL programming", "SQL Server", "ETL processes", "data integrity", "query optimization", "stored procedures", "database security", "performance tuning"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BE/B.Tech, MSC IT",
         experience: "1 - 3 Years",
         department: "Engineering",
         groupname: "Software development",
+        groupid: 1,
         requirements: `
                 <ul>
                     <li>☑️ Develop, maintain, and enhance backend applications using Node.js</li>
@@ -124,53 +127,14 @@ const jobData = [
     },
     {
         id: 4,
-        title: 'Product success & delivery executive',
+        title: 'IT infrastructure & systems executive',
         keywords: [],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BCA",
         experience: "0 - 1 Years",
         department: "Engineering",
-        groupname: "Delivery department",
-        requirements: `
-            <ul>
-                <li>☑️ Ensuring projects are delivered successfully</li>
-                <li>☑️ Internal coordination with developers, designers, QA, PM</li>
-                <li>☑️ Tracking deadlines, tasks, timelines</li>
-                <li>☑️ Making sure the project achieves expected results</li>
-                <li>☑️ Partly client-facing, but more project-focused</li>
-            </ul>
-        `,
-        skills: ""
-    },
-    {
-        id: 5,
-        title: 'Flutter developer (ios & android)',
-        keywords: ["Flutter", "mobile development", "iOS development", "Android development", "cross-platform apps", "JavaScript", "mobile UI/UX", "API integration", "app performance", "mobile app deployment"],
-        location: 'Surat',
-        qualification: "Graduate",
-        experience: "1 - 3 Years",
-        department: "Engineering",
-        groupname: "Software development",
-        requirements: `
-            <ul>
-                <li>☑️ Design, develop, and maintain mobile applications for iOS and Android platforms.</li>
-                <li>☑️ Write clean, scalable code and conduct unit testing to ensure functionality.</li>
-                <li>☑️ Troubleshoot and debug applications, resolving issues in a timely manner.</li>
-                <li>☑️ Stay up-to-date with the latest industry trends and technologies.</li>
-                <li>☑️ Participate in code reviews and contribute</li>
-            </ul>
-        `,
-        skills: "",
-    },
-    {
-        id: 6,
-        title: 'It infrastructure & systems executive',
-        keywords: [],
-        location: 'Surat',
-        qualification: "Graduate",
-        experience: "0 - 1 Years",
-        department: "Engineering",
-        groupname: "It infrastructure",
+        groupname: "IT infrastructure",
+        groupid: 8,
         requirements: `
            <ul>
                 <li>☑️ Proven experience in IT infrastructure, network administration, or system support roles</li>
@@ -210,14 +174,15 @@ const jobData = [
         `
     },
     {
-        id: 7,
+        id: 5,
         title: 'Next js developer',
         keywords: ["Next.js", "React development", "Node.js", "frontend development", "JavaScript", "TypeScript", "web applications", "server-side rendering", "API integration", "MSSQL"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BE/B.Tech, MSC IT",
         experience: "1 - 3 Years",
         department: "Engineering",
         groupname: "Software development",
+        groupid: 1,
         requirements: `
             <ul>
                 <li>☑️ Write effective, scalable code using Node.js and Socket.IO</li>
@@ -245,14 +210,81 @@ const jobData = [
         `
     },
     {
-        id: 8,
+        id: 6,
         title: 'Inside sales executive',
         keywords: ["business development", "sales", "client acquisition", "market research", "lead generation", "client relationship", "sales strategy", "B2B sales", "revenue growth", "business expansion"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BBA/BBM, MBA, BCA, Bcom, Bachelor's (Preferred)",
         experience: "0 - 1 Years",
         department: "Engineering",
         groupname: "Sales",
+        groupid: 6,
+        requirements: `
+            <ul>
+                <li>☑️ Gather and manage customer information across touchpoints</li>
+                <li>☑️ Schedule and conduct meetings with prospects and clients</li>
+                <li>☑️ Present product and corporate decks effectively</li>
+                <li>☑️ Deliver engaging software demos tailored to client needs</li>
+                <li>☑️ Identify client challenges and propose appropriate solutions</li>
+                <li>☑️ Follow up consistently to drive deals to closure</li>
+                <li>☑️ Collect client feedback and testimonials post-sale</li>
+                <li>☑️ Share success stories to build brand credibility</li>
+                <li>☑️ Recommend product add-ons and upgrades for retention</li>
+                <li>☑️ Build and nurture pipeline via cold calls, networking, and referrals</li>
+            </ul>
+        `,
+        skills: `
+            <ul>
+                <li>☑️ Bachelor’s degree in Business, Marketing, or related field</li>
+                <li>☑️ Strong communication, negotiation, and presentation skills</li>
+                <li>☑️ Proven ability to generate leads and close sales</li>
+                <li>☑️ Excellent organizational and time management abilities</li>
+                <li>☑️ Understanding of sales pipeline development and client relationship building</li>
+                <li>☑️ Freshers with strong interpersonal skills are welcome to apply</li>
+            </ul>
+        `
+    },
+    {
+        id: 7,
+        title: 'React js developer',
+        keywords: ["React.js", "frontend development", "JavaScript", "UI/UX", "responsive design", "web applications", "component development", "state management", "frontend architecture", "cross-browser compatibility"],
+        location: 'Surat',
+        qualification: "BE/B.Tech, MSC IT",
+        experience: "0 - 2 Years",
+        department: "Sales",
+        groupname: "Software development",
+        groupid: 1,
+        requirements: `
+            <ul>
+                <li>☑️ Design and develop user interfaces for web applications using React.js</li>
+                <li>☑️ Implement responsive designs for seamless experience across devices and screen sizes</li>
+                <li>☑️ Utilize React component lifecycle methods for optimal rendering</li>
+                <li>☑️ Debug and troubleshoot front-end issues effectively</li>
+                <li>☑️ Participate in code reviews to ensure code quality and best practices</li>
+                <li>☑️ Integrate front-end components with APIs and back-end services</li>
+            </ul>
+        `,
+        skills: `
+            <ul>
+                <li>☑️ Deep understanding of React.js</li>
+                <li>☑️ Strong verbal and written communication in Gujarati/Hindi/English</li>
+                <li>☑️ Ability to find, debug, and fix code errors effectively</li>
+                <li>☑️ Basic understanding of project management</li>
+                <li>☑️ Freshers with relevant qualifications (B.E-IT, B.Tech/B.E-CS, M.C.A) can apply</li>
+                <li>☑️ Interest in developing Cloud ERP-based products</li>
+            </ul>
+        `
+    },
+    {
+        id: 8,
+        title: 'Corporate sales executive (field)',
+        keywords: ["business development", "sales", "client acquisition", "market research", "lead generation", "client relationship", "sales strategy", "B2B sales", "revenue growth", "business expansion"],
+        location: 'Surat',
+        qualification: " BBA/BBM, MBA, BCA, Bcom, Bachelor's (Preferred)",
+        experience: "0 - 1 Years",
+        department: "Engineering",
+        groupname: "Sales",
+        groupid: 6,
         requirements: `
             <ul>
                 <li>☑️ Gather and manage customer information across touchpoints</li>
@@ -280,77 +312,54 @@ const jobData = [
     },
     {
         id: 9,
-        title: 'React js developer',
-        keywords: ["React.js", "frontend development", "JavaScript", "UI/UX", "responsive design", "web applications", "component development", "state management", "frontend architecture", "cross-browser compatibility"],
+        title: 'Flutter + SQL Lite developer (ios & android)',
+        keywords: ["Flutter", "mobile development", "iOS development", "Android development", "cross-platform apps", "JavaScript", "mobile UI/UX", "API integration", "app performance", "mobile app deployment"],
         location: 'Surat',
-        qualification: "Graduate",
-        experience: "0 - 2 Years",
-        department: "Sales",
+        qualification: "BE/B.Tech, BSC IT, MSC IT",
+        experience: "1 - 3 Years",
+        department: "Engineering",
         groupname: "Software development",
+        groupid: 1,
         requirements: `
             <ul>
-                <li>☑️ Design and develop user interfaces for web applications using React.js</li>
-                <li>☑️ Implement responsive designs for seamless experience across devices and screen sizes</li>
-                <li>☑️ Utilize React component lifecycle methods for optimal rendering</li>
-                <li>☑️ Debug and troubleshoot front-end issues effectively</li>
-                <li>☑️ Participate in code reviews to ensure code quality and best practices</li>
-                <li>☑️ Integrate front-end components with APIs and back-end services</li>
+                <li>☑️ Design, develop, and maintain mobile applications for iOS and Android platforms.</li>
+                <li>☑️ Write clean, scalable code and conduct unit testing to ensure functionality.</li>
+                <li>☑️ Troubleshoot and debug applications, resolving issues in a timely manner.</li>
+                <li>☑️ Stay up-to-date with the latest industry trends and technologies.</li>
+                <li>☑️ Participate in code reviews and contribute</li>
             </ul>
         `,
-        skills: `
-            <ul>
-                <li>☑️ Deep understanding of React.js</li>
-                <li>☑️ Strong verbal and written communication in Gujarati/Hindi/English</li>
-                <li>☑️ Ability to find, debug, and fix code errors effectively</li>
-                <li>☑️ Basic understanding of project management</li>
-                <li>☑️ Freshers with relevant qualifications (B.E-IT, B.Tech/B.E-CS, M.C.A) can apply</li>
-                <li>☑️ Interest in developing Cloud ERP-based products</li>
-            </ul>
-        `
+        skills: "",
     },
     {
         id: 10,
-        title: 'Corporate sales executive (field)',
-        keywords: ["business development", "sales", "client acquisition", "market research", "lead generation", "client relationship", "sales strategy", "B2B sales", "revenue growth", "business expansion"],
+        title: 'Software implementation executive',
+        keywords: [],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "B.Com, M.Com Graduates",
         experience: "0 - 1 Years",
         department: "Engineering",
-        groupname: "Sales",
+        groupname: "Customer support",
+        groupid: 4,
         requirements: `
-            <ul>
-                <li>☑️ Gather and manage customer information across touchpoints</li>
-                <li>☑️ Schedule and conduct meetings with prospects and clients</li>
-                <li>☑️ Present product and corporate decks effectively</li>
-                <li>☑️ Deliver engaging software demos tailored to client needs</li>
-                <li>☑️ Identify client challenges and propose appropriate solutions</li>
-                <li>☑️ Follow up consistently to drive deals to closure</li>
-                <li>☑️ Collect client feedback and testimonials post-sale</li>
-                <li>☑️ Share success stories to build brand credibility</li>
-                <li>☑️ Recommend product add-ons and upgrades for retention</li>
-                <li>☑️ Build and nurture pipeline via cold calls, networking, and referrals</li>
+           <ul>
+                <li>☑️ Good Communication</li>
+                <li>☑️ Decent English (Reading, Writing & Speaking)</li>
+                <li>☑️ Proficient in computer operations and MS Excel & internet-based tasks</li>
             </ul>
         `,
-        skills: `
-            <ul>
-                <li>☑️ Bachelor’s degree in Business, Marketing, or related field</li>
-                <li>☑️ Strong communication, negotiation, and presentation skills</li>
-                <li>☑️ Proven ability to generate leads and close sales</li>
-                <li>☑️ Excellent organizational and time management abilities</li>
-                <li>☑️ Understanding of sales pipeline development and client relationship building</li>
-                <li>☑️ Freshers with strong interpersonal skills are welcome to apply</li>
-            </ul>
-        `
+        skills: ``
     },
     {
         id: 11,
         title: 'Tester - QA',
         keywords: ["quality assurance", "software testing", "test cases", "bug tracking", "UI testing", "test automation", "defect management", "QA processes", "test documentation", "regression testing"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "B.E-IT, B.Tech/B.E -CS, M.C.A ,bsc-it/computer science",
         experience: "0 - 3 Years",
         department: "Sales",
         groupname: "Testing",
+        groupid: 2,
         requirements: `
             <ul>
                 <li>☑️ Review software requirements and create test scenarios</li>
@@ -375,62 +384,14 @@ const jobData = [
     },
     {
         id: 12,
-        title: 'Software implementation executive',
-        keywords: [],
-        location: 'Surat',
-        qualification: "Graduate",
-        experience: "0 - 1 Years",
-        department: "Engineering",
-        groupname: "Customer support",
-        requirements: `
-           <ul>
-                <li>☑️ Good Communication</li>
-                <li>☑️ Decent English (Reading, Writing & Speaking)</li>
-                <li>☑️ Proficient in computer operations and MS Excel & internet-based tasks</li>
-            </ul>
-        `,
-        skills: ``
-    },
-    {
-        id: 13,
-        title: 'Software business analyst',
-        keywords: ["project management", "coordination", "documentation", "project planning", "stakeholder management", "project lifecycle", "business analysis", "requirements gathering", "project tracking", "team collaboration"],
-        location: 'Surat',
-        qualification: "Graduate",
-        experience: "0 - 2 Years",
-        department: "Sales",
-        groupname: "Documentation",
-        requirements: `
-            <ul>
-                <li>☑️ Create and maintain comprehensive project documentation, plans, and status reports</li>
-                <li>☑️ Supervise project procurement processes and ensure timely delivery</li>
-                <li>☑️ Collaborate with field personnel to resolve on-site project issues</li>
-                <li>☑️ Gather and document project requirements, relay them to the development team</li>
-                <li>☑️ Manage the software development lifecycle and ensure timely completion</li>
-                <li>☑️ Support technical services, system development, and program teams</li>
-            </ul>
-        `,
-        skills: `
-            <ul>
-                <li>☑️ Strong coordination and communication skills with development teams</li>
-                <li>☑️ Understanding of business process management and general system workflows</li>
-                <li>☑️ Knowledge of preparing BRS (Business Requirement Specification) & SRS (Software Requirement Specification) documents</li>
-                <li>☑️ Proficient in verbal and written communication (Hindi/English)</li>
-                <li>☑️ Qualification: B.E-IT / B.Tech-CS / M.C.A</li>
-                <li>☑️ Freshers are eligible to apply</li>
-                <li>☑️ Experience in Cloud ERP-based software is a plus</li>
-            </ul>
-        `
-    },
-    {
-        id: 14,
         title: 'Customer support executive',
         keywords: ["customer service", "technical support", "client assistance", "troubleshooting", "customer satisfaction", "helpdesk support", "product support", "issue resolution", "client onboarding", "service quality"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BCom, BBA, BCA(Preferred)",
         experience: "0 - 1 Years",
         department: "Engineering",
         groupname: "Customer support",
+        groupid: 4,
         requirements: `
             <ul>
                 <li>☑️ Learn app/ERP updates and guide customers effectively</li>
@@ -457,14 +418,68 @@ const jobData = [
         `
     },
     {
+        id: 13,
+        title: 'Software business analyst',
+        keywords: ["project management", "coordination", "documentation", "project planning", "stakeholder management", "project lifecycle", "business analysis", "requirements gathering", "project tracking", "team collaboration"],
+        location: 'Surat',
+        qualification: " BCA / BE Computer / Diploma in compute",
+        experience: "0 - 2 Years",
+        department: "Sales",
+        groupname: "Documentation",
+        groupid: 3,
+        requirements: `
+            <ul>
+                <li>☑️ Create and maintain comprehensive project documentation, plans, and status reports</li>
+                <li>☑️ Supervise project procurement processes and ensure timely delivery</li>
+                <li>☑️ Collaborate with field personnel to resolve on-site project issues</li>
+                <li>☑️ Gather and document project requirements, relay them to the development team</li>
+                <li>☑️ Manage the software development lifecycle and ensure timely completion</li>
+                <li>☑️ Support technical services, system development, and program teams</li>
+            </ul>
+        `,
+        skills: `
+            <ul>
+                <li>☑️ Strong coordination and communication skills with development teams</li>
+                <li>☑️ Understanding of business process management and general system workflows</li>
+                <li>☑️ Knowledge of preparing BRS (Business Requirement Specification) & SRS (Software Requirement Specification) documents</li>
+                <li>☑️ Proficient in verbal and written communication (Hindi/English)</li>
+                <li>☑️ Qualification: B.E-IT / B.Tech-CS / M.C.A</li>
+                <li>☑️ Freshers are eligible to apply</li>
+                <li>☑️ Experience in Cloud ERP-based software is a plus</li>
+            </ul>
+        `
+    },
+    {
+        id: 14,
+        title: 'Client success & delivery executive',
+        keywords: [],
+        location: 'Surat',
+        qualification: "B.com",
+        experience: "0 - 1 Years",
+        department: "Engineering",
+        groupname: "Delivery department",
+        groupid: 5,
+        requirements: `
+            <ul>
+                <li>☑️ Ensuring clients are satisfied</li>
+                <li>☑️ Managing onboarding, training, feedback, and communication</li>
+                <li>☑️ Handling delivery status updates with the client</li>
+                <li>☑️ Making sure the project achieves expected results</li>
+                <li>☑️ Post-delivery relationship (support, feedback, retention)</li>
+            </ul>
+        `,
+        skills: ""
+    },
+    {
         id: 15,
         title: 'Jr. business analyst',
         keywords: ["project management", "coordination", "documentation", "project planning", "stakeholder management", "project lifecycle", "business analysis", "requirements gathering", "project tracking", "team collaboration"],
         location: 'Surat',
-        qualification: "Graduate",
+        qualification: "BCA/BE Computer/Diploma in computer/or related field.",
         experience: "0 - 2 Years",
         department: "Sales",
         groupname: "Documentation",
+        groupid: 3,
         requirements: `
             <ul>
                 <li>☑️ Create and maintain comprehensive project documentation, plans, and status reports</li>
@@ -489,20 +504,21 @@ const jobData = [
     },
     {
         id: 16,
-        title: 'Client success & delivery executive',
+        title: 'Product success & delivery executive',
         keywords: [],
         location: 'Surat',
         qualification: "Graduate",
         experience: "0 - 1 Years",
         department: "Engineering",
         groupname: "Delivery department",
+        groupid: 5,
         requirements: `
             <ul>
-                <li>☑️ Ensuring clients are satisfied</li>
-                <li>☑️ Managing onboarding, training, feedback, and communication</li>
-                <li>☑️ Handling delivery status updates with the client</li>
+                <li>☑️ Ensuring projects are delivered successfully</li>
+                <li>☑️ Internal coordination with developers, designers, QA, PM</li>
+                <li>☑️ Tracking deadlines, tasks, timelines</li>
                 <li>☑️ Making sure the project achieves expected results</li>
-                <li>☑️ Post-delivery relationship (support, feedback, retention)</li>
+                <li>☑️ Partly client-facing, but more project-focused</li>
             </ul>
         `,
         skills: ""

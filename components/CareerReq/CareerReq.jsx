@@ -41,7 +41,7 @@ const CareerReq = ({ jobSlug, jobTitle }) => {
 
             <div className="career-req-contentDiv">
                 <div className="career-req-content">
-                    <h2 className="heading">Requirement for the {jobTitle}</h2>
+                    <h2 className="heading">{jobTitle}</h2>
                 </div>
                 {getJobsData?.requirements && (
                     <div className="career-req-responsobilities-content">

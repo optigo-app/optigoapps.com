@@ -1,7 +1,7 @@
 'use client'
 
 // InforCareers.jsx
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Careerinfo.scss';
 import { ChevronRight, MapPin, GraduationCap, Timer, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
@@ -32,16 +32,7 @@ const Careerinfo = () => {
     // const getDept = jobData?.filter((job) => {
     //     departments.push(job.title);
     // })
-    // const departments = useMemo(() => [...new Set(jobData?.map(job => job.groupname))], []);
-    const departments = useMemo(() => {
-        return [
-            ...new Map(
-                [...jobData] // clone to avoid mutation
-                    .sort((a, b) => a.groupid - b.groupid)
-                    .map(job => [job.groupname, job.groupname])
-            ).values()
-        ];
-    }, [jobData]);
+    const departments = [...new Set(jobData?.map(job => job.groupname))];
 
     const scrollToJobs = () => {
         jobListRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -51,24 +42,22 @@ const Careerinfo = () => {
         setLoading(true);
 
         const handler = setTimeout(() => {
-            // setDebouncedLocation(location);
+            setDebouncedLocation(location);
             setLoading(false);
         }, 500);
 
         return () => clearTimeout(handler);
         // getDept;
-    }, []);
+    }, [location]);
 
-    const filteredJobs = useMemo(() => {
-        return jobData.filter(job => {
-            // const matchesDepartment = selectedDepartment ? job.title === selectedDepartment : true;
-            const matchesDepartment = selectedDepartment ? job.groupname === selectedDepartment : true;
-            const matchesLocation = debouncedLocation
-                ? job.location.toLowerCase().includes(debouncedLocation.toLowerCase())
-                : true;
-            return matchesDepartment && matchesLocation;
-        });
-    }, [selectedDepartment, location])
+    const filteredJobs = jobData.filter(job => {
+        // const matchesDepartment = selectedDepartment ? job.title === selectedDepartment : true;
+        const matchesDepartment = selectedDepartment ? job.groupname === selectedDepartment : true;
+        const matchesLocation = debouncedLocation
+            ? job.location.toLowerCase().includes(debouncedLocation.toLowerCase())
+            : true;
+        return matchesDepartment && matchesLocation;
+    });
 
     const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
 
@@ -77,16 +66,16 @@ const Careerinfo = () => {
         currentPage * ITEMS_PER_PAGE
     );
 
-    // const handlePageChange = (page) => {
-    //     if (page >= 1 && page <= totalPages) {
-    //         setLoading(true);
-    //         setCurrentPage(page);
-    //         setTimeout(() => {
-    //             setLoading(false);
-    //             window.scrollTo({ top: 0, behavior: 'smooth' });
-    //         }, 1000);
-    //     }
-    // };
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setLoading(true);
+            setCurrentPage(page);
+            setTimeout(() => {
+                setLoading(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 1000);
+        }
+    };
 
     // const handleLocationChange = (e) => {
     //     setLocation(e.target.value);
@@ -97,7 +86,7 @@ const Careerinfo = () => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-        }, 500);
+        }, 1000);
     };
 
     // const handleFilterSubmit = () => {
@@ -112,7 +101,7 @@ const Careerinfo = () => {
 
     return (
         <div className="optigoapps-careers">
-            <ModernGallery scrollToJobs={scrollToJobs} />
+              <ModernGallery scrollToJobs={scrollToJobs} />
             {/* <header className="header">
                 <div className="banner">
                     <div className="overlay">
@@ -209,17 +198,21 @@ const Careerinfo = () => {
                             <>
                                 <div className="job-grid">
                                     {filteredJobs.map((job) => (
-                                        <div
-                                            className="job-card-modern"
+                                        <Link 
+                                            className="job-card-modern" 
                                             key={job.id}
-                                            // onClick={(e) =>
-                                            //     handleUrlNavigation(e,
-                                            //         `/career/${job.title
-                                            //             .toLowerCase()
-                                            //             .replace(/\s+/g, '-')
-                                            //             .replace(/[^\w-]/g, '')}`
-                                            //     )
-                                            // }
+                                            href={`/career/${job.title
+                                                .toLowerCase()
+                                                .replace(/\s+/g, '-')
+                                                .replace(/[^\w-]/g, '')}`}
+                                            onClick={(e) =>
+                                                handleUrlNavigation(e,
+                                                    `/career/${job.title
+                                                        .toLowerCase()
+                                                        .replace(/\s+/g, '-')
+                                                        .replace(/[^\w-]/g, '')}`
+                                                )
+                                            }
                                         >
                                             <div className="job-info">
                                                 <h3 className="job-title">{job.title}</h3>
@@ -229,40 +222,38 @@ const Careerinfo = () => {
                                                         {job.location}
                                                     </span>
                                                     <span style={{ borderLeft: "1px solid #bdbdbd", paddingLeft: "0.6rem" }}>
+                                                        <GraduationCap size={16} strokeWidth={2} />
+                                                        {job.qualification}
+                                                    </span>
+                                                    <span style={{ borderLeft: "1px solid #bdbdbd", paddingLeft: "0.6rem" }}>
                                                         <Timer size={16} strokeWidth={2} />
                                                         {job.experience}
                                                     </span>
                                                 </div>
-                                                <div className="job-details">
-                                                    <span>
-                                                        <GraduationCap size={16} strokeWidth={2} />
-                                                        {job.qualification}
-                                                    </span>
-                                                </div>
                                             </div>
                                             <div className="job-action">
-                                                <Link
+                                                {/* <Link
                                                     className="apply-now"
                                                     href={`/career/${job.title
                                                         .toLowerCase()
                                                         .replace(/\s+/g, '-')
                                                         .replace(/[^\w-]/g, '')}`}
-                                                    onClick={(e) =>
-                                                        handleUrlNavigation(e,
-                                                            `/career/${job.title
-                                                                .toLowerCase()
-                                                                .replace(/\s+/g, '-')
-                                                                .replace(/[^\w-]/g, '')}`
-                                                        )
-                                                    }
+                                                    // onClick={(e) =>
+                                                    //     handleUrlNavigation(e,
+                                                    //         `/career/${job.title
+                                                    //             .toLowerCase()
+                                                    //             .replace(/\s+/g, '-')
+                                                    //             .replace(/[^\w-]/g, '')}`
+                                                    //     )
+                                                    // }
                                                 >
                                                     Apply Now <span className="arrow"><ChevronRight /></span>
-                                                </Link>
-                                                {/* <span className="apply-now">
-                                                    Apply Now <span className="arrow"><ChevronRight /></span>
-                                                </span> */}
+                                                </Link> */}
+                                                  <span className="apply-now">
+                                                        Apply Now <span className="arrow"><ChevronRight /></span>
+                                                </span>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </>
