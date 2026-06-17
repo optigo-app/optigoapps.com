@@ -41,21 +41,27 @@ const CareerReq = ({ jobSlug, jobTitle }) => {
 
             <div className="career-req-contentDiv">
                 <div className="career-req-content">
-                    <h2 className="heading">Requirement for the {jobTitle}</h2>
+                    <h2 className="heading">{jobTitle}</h2>
                 </div>
-                <div className="career-req-responsobilities-content">
-                    <h2 className="heading">Roles & Responsibilities</h2>
-                    <div
-                        className="description"
-                        dangerouslySetInnerHTML={{
-                            __html: getJobsData?.requirements
-                        }}
-                    />
-                </div>
-                <div className="career-req-skills-content">
-                    <h2 className="heading">Preferred Skills</h2>
-                    <div className="description" dangerouslySetInnerHTML={{ __html: getJobsData?.skills }} />
-                </div>
+                {getJobsData?.requirements && (
+                    <div className="career-req-responsobilities-content">
+                        <h2 className="heading">Roles & Responsibilities</h2>
+                        <div
+                            className="description"
+                            dangerouslySetInnerHTML={{
+                                __html: getJobsData?.requirements
+                            }}
+                        />
+                    </div>
+                )}
+                {getJobsData?.skills && (
+                    <>
+                        <div className="career-req-skills-content">
+                            <h2 className="heading">Preferred Skills</h2>
+                            <div className="description" dangerouslySetInnerHTML={{ __html: getJobsData?.skills }} />
+                        </div>
+                    </>
+                )}
                 <div className="career-req-applyBtnDiv">
                     <Link href="/career-form" onClick={(e) => handleNavigation(e, '/career-form')}>Apply Now</Link>
                 </div>

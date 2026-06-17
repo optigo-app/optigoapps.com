@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import LoadingModal from '../LoadingModal';
 import './CareerForm.scss';
 import { countryCodes } from '@/public/CountryCodes';
 import jobData from '@/public/jobsOpenings';
 import { UploadMedia } from '@/api/initialApi/UploadMedia';
 import { CareerFormApi } from '@/api/CareerForm/CareerForm';
-import { EmailSending } from '@/api/EmailApi/EmailSending';
+// import { EmailSending } from '@/api/EmailApi/EmailSending';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
+import { CustEmailSending } from '@/api/EmailApi/CustomEmailSending';
 
 const CareerForm = () => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -26,7 +27,7 @@ const CareerForm = () => {
     useEffect(() => {
         setIsLocal(["localhost", "nzen"]?.includes(window.location.hostname));
     }, []);
-
+    
     const fileInputRef = useRef(null);
     const [resumeFile, setResumeFile] = useState(null);
     const [resumeError, setResumeError] = useState('');
@@ -35,6 +36,13 @@ const CareerForm = () => {
 
     const [errors, setErrors] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const itemRefs = useRef([]);
+    const dropdownRef = useRef(null);
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -52,238 +60,311 @@ const CareerForm = () => {
         consent: false,
     });
 
+    useEffect(() => {
+        if (isSuccess) {
+            const timer = setTimeout(() => {
+                setIsSuccess(false);
+            }, 4000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isSuccess]);
+
+    useEffect(() => {
+        if (activeIndex >= 0 && itemRefs.current[activeIndex]) {
+          itemRefs.current[activeIndex].scrollIntoView({
+            block: "nearest",
+          });
+        }
+    }, [activeIndex]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setIsOpen(false);
+                setActiveIndex(-1);
+                setSearch("");
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const sortedData = useMemo(() => [...jobData].sort((a, b) => (b.id % 2) - (a.id % 2) || a.id - b.id), [jobData]);
+
     const handleChange = (e) => {
         const { name, type, checked, value } = e.target;
+
         setFormData((prev) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
 
-        if (name === "mobileCode") {
-            const country = countryCodes.find((c) => c.code === value);
-            let phoneCode = '';
-            let min = 1;
-            let max = 15; // Default max length
+        // if (name === "mobileCode") {
+        //     const country = countryCodes.find((c) => c.code === value);
+        //     let phoneCode = '';
+        //     let min = 1;
+        //     let max = 10;
 
-            if (country) {
-                phoneCode = country.phone;
-                if (Array.isArray(country.phoneLength)) {
-                    min = Math.min(...country.phoneLength);
-                    max = Math.max(...country.phoneLength);
-                } else if (country.phoneLength) {
-                    min = country.phoneLength;
-                    max = country.phoneLength;
-                } else if (country.min && country.max) {
-                    min = country.min;
-                    max = country.max;
+        //     if (country) {
+        //         phoneCode = country.phone;
+        //         if (Array.isArray(country.phoneLength)) {
+        //             min = Math.min(...country.phoneLength);
+        //             max = Math.max(...country.phoneLength);
+        //         } else if (country.phoneLength) {
+        //             min = country.phoneLength;
+        //             max = country.phoneLength;
+        //         } else if (country.min && country.max) {
+        //             min = country.min;
+        //             max = country.max;
+        //         }
+        //     }
+
+        //     setMinLen(min);
+        //     setMaxLen(max);
+
+        //     setFormData((prev) => ({
+        //         ...prev,
+        //         mobileCode: value,
+        //         mobileNoCode: phoneCode
+        //     }));
+        // }
+
+        // if (name === "mobile") {
+        //     if (value.replace(/\D/g, "").length <= maxLen) {
+        //         setFormData((prev) => ({ ...prev, mobile: value }));
+        //     }
+        // }
+
+        setErrors((prev) => {
+            const updatedErrors = { ...prev };
+
+            const messages = {
+                firstName: "Please enter your first name",
+                lastName: "Please enter your last name",
+                gender: "Please select your gender",
+                email: "Please enter your email",
+                mobile: "Please enter your mobile number",
+                years: "Please enter your experience in years or months",
+                currentLocation: "Please enter your current location",
+                department: "Please select your department",
+                joinDays: "Please select joining date"
+            };
+
+            if (!value || value.trim() === "") {
+
+                if (messages[name]) {
+                    updatedErrors[name] = messages[name];
+                }
+            } else if (name === "email") {
+                if(!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
+                    updatedErrors.email = "Please enter a valid email address";
+                } else {
+                    delete updatedErrors.email;
+                }
+            }  else if (name === "mobile") {
+                if (!/^\d+$/.test(value)) {
+                    updatedErrors.mobile = "Mobile number must contain only numbers";
+                } else if (value.length < maxLen) {
+                    updatedErrors.mobile = "Mobile number must be 10 digits";
+                } else {
+                    delete updatedErrors.mobile;
+                }
+            } else if (name === "joinDays") {
+                const selectedDate = new Date(value);
+                const today = new Date();
+        
+                // normalize time for accurate comparison
+                selectedDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+        
+                if (selectedDate < today) {
+                    updatedErrors.joinDays = "Previous date id not allowed";
+                } else {
+                    delete updatedErrors.joinDays;
                 }
             }
-
-            setMinLen(min);
-            setMaxLen(max);
-
-            setFormData((prev) => ({
-                ...prev,
-                mobileCode: value,
-                mobileNoCode: phoneCode
-            }));
-        }
-
-        if (name === "mobile") {
-            // Only allow digits up to maxLen
-            if (value.replace(/\D/g, "").length <= maxLen) {
-                setFormData((prev) => ({ ...prev, mobile: value }));
+            else if (name === "consent" && checked !== true) {
+                updatedErrors.consent = "Please accept the terms and conditions";
+            } else {
+                delete updatedErrors[name];
             }
-        }
 
+            return updatedErrors;
+        })
     };
 
     // ✅ Utility: always wrap into array
     const ensureArray = (val) => Array.isArray(val) ? val : [val];
 
     // ✅ Helper to build email payload
-    const buildEmailData = (type, formData) => {
-        if (type === "hr") {
-            return {
-                fromEmail: "noreply@optigoapps.com",
-                toEmail: ensureArray("job@orail.in"), // HR email(s) 
-                subject: `New Job Application Received – ${formData.firstName} ${formData.lastName}`,
-                // message: `Hi Team, \n A new job application has been submitted. Below are the candidate's details: \n Name: ${formData.firstName} ${formData.middleName} ${formData.lastName} \n Email: ${formData.email} \n Gender: ${formData.gender} \n Phone: ${formData.mobileCode} ${formData.mobile} \n Experience: ${formData.years} \n Available to Join: ${formData.joinDays} days \n Current Location: ${formData.currentLocation} \n Field / Department: ${formData.department} \n Resume: ${formData.fileName} \n Please review and proceed with the next steps. \n Best regards, \n https://optigoapps.com`,
-                htmlTemplate: `
-                <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: #333333;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
-                    
-                    <!-- Header -->
-                    <tr>
-                    <td style="background-color: #7608AF; padding: 30px 20px; text-align: center;">
-                        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">📥 New Job Application</h1>
-                    </td>
-                    </tr>
+    const buildEmailData = (formData) => {
+        return {
+            fromEmail: "noreply@optigoapps.com",
+            toEmail: ensureArray("job@orail.in"), // HR email(s) 
+            cust_toEmail: ensureArray(formData.email), // Customer email(s) 
+            subject: `New Job Application Received – ${formData.firstName} ${formData.lastName}`,
+            cust_subject: "Your Job Application Has Been Submitted",
+            // message: `Hi Team, \n A new job application has been submitted. Below are the candidate's details: \n Name: ${formData.firstName} ${formData.middleName} ${formData.lastName} \n Email: ${formData.email} \n Gender: ${formData.gender} \n Phone: ${formData.mobileCode} ${formData.mobile} \n Experience: ${formData.years} \n Available to Join: ${formData.joinDays} days \n Current Location: ${formData.currentLocation} \n Field / Department: ${formData.department} \n Resume: ${formData.fileName} \n Please review and proceed with the next steps. \n Best regards, \n https://optigoapps.com`,
+            htmlTemplate: `
+                   <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: #333333;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                            <!-- Header -->
+                            <tr>
+                            <td style="background: #8C8C8C; padding:20px 24px;">
+                                <table width="100%" role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                    <tr>
+                                    <td align="left">
+                                        <a href="https://optigoapps.com" target="_blank" style="text-decoration:none;">
+                                        <span style="display:inline-block; font-weight:700; font-size:18px; color:#ffffff; letter-spacing:0.3px;">OptigoApps</span>
+                                        </a>
+                                    </td>
+                                    </tr>
+                                </table>
+                                </td>
+                            </tr>
 
-                    <!-- Content -->
-                    <tr>
-                    <td style="padding: 30px 25px; font-size: 15px; line-height: 1.6;">
-                        <p style="margin-top: 0;">Hi Team,</p>
-                        <p style="margin-bottom: 24px;">You’ve received a new job application. Here are the details:</p>
+                            <!-- Content -->
+                            <tr>
+                            <td style="padding: 30px 25px; font-size: 15px; line-height: 1.6;">
+                                <p style="margin-top: 0;"><strong>Hello Team,</strong></p>
+                                <p style="margin-bottom: 24px;">You’ve received a new job application. Here are the details:</p>
 
-                        <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
-                        <tr>
-                            <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
-                            <td>${formData.firstName} ${formData.middleName} ${formData.lastName}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Email:</td>
-                            <td><a href="mailto:${formData.email}" style="color: #0056d2; text-decoration: none;">${formData.email}</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Gender:</td>
-                            <td>${formData.gender}</td>
-                        </tr>
-                         <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Phone:</td>
-                            <td><a href="tel:${formData.mobileNoCode}${formData.mobile}" style="color: #0056d2; text-decoration: none;">+${formData.mobileNoCode}-${formData.mobile}</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Experience:</td>
-                            <td>${formData.years}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Available to Join:</td>
-                            <td>${formData.joinDays} ${formData.joinDays === 1 ? "day" : "days"}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Current Location:</td>
-                            <td>${formData.currentLocation}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Field / Department:</td>
-                            <td>${formData.department}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Resume:</td>
-                            <td>
-                            ${formData.resumeUrl
-                        ? `<a href="${formData.resumeUrl}" style="color: #0056d2; text-decoration: none;" target="_blank">${formData.fileName}</a>`
-                        : `${formData.fileName}`}
+                                <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
+                                    <td>${formData.firstName} ${formData.lastName}</td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="font-weight: 600; color: #444;">Email:</td>
+                                    <td><a href="mailto:${formData.email}" style="color: #0056d2; text-decoration: none;">${formData.email}</a></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600; color: #444;">Gender:</td>
+                                    <td>${formData.gender}</td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="font-weight: 600; color: #444;">Phone:</td>
+                                    <td><a href="tel:+91 ${formData.mobile}" style="color: #0056d2; text-decoration: none;">+91 ${formData.mobile}</a></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600; color: #444;">Experience:</td>
+                                    <td>${formData.years}</td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="font-weight: 600; color: #444;">Available to Join from:</td>
+                                    <td>${formData.joinDays}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600; color: #444;">Current City:</td>
+                                    <td>${formData.currentLocation}</td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="font-weight: 600; color: #444;">Field / Department:</td>
+                                    <td>${formData.department}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600; color: #444;">Resume:</td>
+                                    <td>
+                                    ${formData.resumeUrl
+                                    ? `<a href="${formData.resumeUrl}" style="color: #0056d2; text-decoration: none;" target="_blank">${formData.fileName}</a>`
+                                    : `${formData.fileName}`}
+                                    </td>
+                                </tr>
+
+                                </table>
+
+                                <p style="margin-top: 30px;">Please review the application and proceed with the next steps.</p>
+
+                                <p style="margin:0;">Regards,</p>
+                                <p style="margin:0;"><strong>OptigoApps System</strong></p>
                             </td>
-                        </tr>
+                            </tr>
 
+                            <!-- Footer -->
+                            <tr>
+                            <td style="background-color: #f0f2f5; padding: 15px 20px; text-align: center; font-size: 12px; color: #888;">
+                                &copy; ${new Date().getFullYear()} Optigoapps. All rights reserved.
+                            </td>
+                            </tr>
                         </table>
-
-                        <p style="margin-top: 30px;">Please review the application and proceed with the next steps.</p>
-
-                        <p style="margin-top: 40px;">Best regards,<br />
-                        <a href="https://optigoapps.com" style="color: #0056d2; text-decoration: none; font-weight: bold;">Optigoapps</a>
-                        </p>
-                    </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                    <td style="background-color: #f0f2f5; padding: 15px 20px; text-align: center; font-size: 12px; color: #888;">
-                        &copy; ${new Date().getFullYear()} Optigoapps. All rights reserved.
-                    </td>
-                    </tr>
-                </table>
-                </body>
-
+                    </body>
                 `,
-                mode: "career",
-                ufcc: isLocal ? "orail25" : "test74",
-                templateNo: 0
-            };
-        }
-
-        if (type === "applicant") {
-            return {
-                fromEmail: "noreply@optigoapps.com",
-                toEmail: ensureArray([formData.email]), // applicant email always array
-                subject: `New Job Application Received – ${formData.firstName} ${formData.lastName}`,
-                // message: `Hi ${formData.firstName}, \n Thank you for applying to the ${formData.department} position at OptigoApps. \n We’ve received your application and our hiring team is currently reviewing your details. If your profile matches our requirements, we’ll be in touch shortly. \n In the meantime, feel free to explore more about our company at ${"https://optigoapps.com"}. \n Here’s a quick summary of your submission: \n Name: ${formData.firstName} ${formData.middleName} ${formData.lastName} \n Email: ${formData.email} \n Experience: ${formData.years} \n Location: ${formData.currentLocation} \n Available to Join: ${formData.joinDays} days \n Department: ${formData.department} \n Thanks again for your interest in joining our team! \n Best regards, \n HR Team – OptigoApps. \n https://optigoapps.com \n hr@orail.in`,
-                htmlTemplate: `
-               <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: #333333;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
-                    
-                    <!-- Header -->
-                    <tr>
-                    <td style="background-color: #7608AF; padding: 30px 20px; text-align: center;">
-                        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Thank You for Applying!</h1>
-                    </td>
-                    </tr>
-
-                    <!-- Body -->
-                    <tr>
-                    <td style="padding: 30px 25px; font-size: 15px; line-height: 1.6;">
-                        <p style="margin-top: 0;">Hi ${formData.firstName},</p>
-                        <p>Thank you for applying to the <strong>${formData.department}</strong> position at <strong>OptigoApps</strong>.</p>
-                        <p>We've received your application, and our hiring team is currently reviewing your details. If your profile matches our requirements, we'll be in touch shortly.</p>
-
-                        <p>In the meantime, feel free to explore more about our company at: <br />
-                        <a href="https://optigoapps.com" style="color: #0a66c2; text-decoration: none;">https://optigoapps.com</a>
-                        </p>
-
-                        <h3 style="margin-top: 30px; font-size: 16px; color: #0a66c2;">📝 Application Summary</h3>
-
-                        <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
-                        <tr>
-                            <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
-                            <td>${formData.firstName} ${formData.middleName} ${formData.lastName}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Email:</td>
-                            <td><a href="mailto:${formData.email}" style="color: #0a66c2; text-decoration: none;">${formData.email}</a></td>
-                        </tr>
-                         <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Phone:</td>
-                            <td><a href="tel:${formData.mobileNoCode}${formData.mobile}" style="color: #0056d2; text-decoration: none;">+${formData.mobileNoCode}-${formData.mobile}</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Experience:</td>
-                            <td>${formData.years}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Location:</td>
-                            <td>${formData.currentLocation}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 600; color: #444;">Available to Join:</td>
-                            <td>${formData.joinDays} ${formData.joinDays === 1 ? "day" : "days"}</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="font-weight: 600; color: #444;">Department:</td>
-                            <td>${formData.department}</td>
-                        </tr>
-               
-
+            cust_htmlTemplate: `
+                   <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: #333333;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                            <tr>
+                                <td style="background-color: #8C8C8C; padding: 20px 10px; text-align: center;">
+                                    <h1 style="color: #ffffff; margin: 0; font-size: 20px;">Thank You for Applying!</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 30px 25px; font-size: 15px; line-height: 1.6;">
+                                    <p style="margin-top: 0;"><strong>Dear ${formData.firstName},</strong></p>
+                                    <p>Thank you for applying with us.</p>
+                                    <p>We have successfully received your job application for <strong>${formData.department}.</strong></p>
+                                    <p>Our HR team will review your details and contact you if your profile matches our requirements.</p>
+                                    <p>Please note that only shortlisted candidates will be contacted </p>
+                                    <h3 style="margin-top: 30px; font-size: 16px; color: #0a66c2;">📝 Application Summary</h3>
+                                    <table cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px;">
+                                        <tr>
+                                            <td style="font-weight: 600; width: 180px; color: #444;">Name:</td>
+                                            <td>${formData.firstName} ${formData.lastName}</td>
+                                        </tr>
+                                        <tr style="background-color: #f9f9f9;">
+                                            <td style="font-weight: 600; color: #444;">Email:</td>
+                                            <td><a href="mailto:${formData.email}" style="color: #0a66c2; text-decoration: none;">${formData.email}</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 600; color: #444;">Phone:</td>
+                                            <td>
+                                                <a href="tel:+91 ${formData.mobile}" style="color: #0056d2; text-decoration: none;">+91 ${formData.mobile}</a>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #f9f9f9;">
+                                            <td style="font-weight: 600; color: #444;">Experience:</td>
+                                            <td>${formData.years}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 600; color: #444;">Current City</td>
+                                            <td>${formData.currentLocation}</td>
+                                        </tr>
+                                        <tr style="background-color: #f9f9f9;">
+                                            <td style="font-weight: 600; color: #444;">Available to Join from:</td>
+                                            <td>${formData.joinDays}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 600; color: #444;">Department:</td>
+                                            <td>${formData.department}</td>
+                                        </tr>   
+                                    </table>
+                                        <p style="margin-top: 30px;">We appreciate your interest and wish you all the best.</p>
+                                        <p style="margin-top: 30px;">Warm regards,<br />
+                                            <strong>HR Team – OptigoApps</strong><br />
+                                            <a href="mailto:job@orail.in" style="color: #0a66c2; text-decoration: none;">job@orail.in</a><br />
+                                            <a href="https://optigoapps.com" style="color: #0a66c2; text-decoration: none;">https://optigoapps.com</a>
+                                        </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: #f0f2f5; padding: 15px 20px; text-align: center; font-size: 12px; color: #888;">
+                                    &copy; ${new Date().getFullYear()} OptigoApps. All rights reserved.
+                                </td>
+                            </tr>
                         </table>
-
-                        <p style="margin-top: 30px;">Thanks again for your interest in joining our team!</p>
-
-                        <p style="margin-top: 30px;">Best regards,<br />
-                        <strong>HR Team – OptigoApps</strong><br />
-                        <a href="mailto:job@orail.in" style="color: #0a66c2; text-decoration: none;">job@orail.in</a><br />
-                        <a href="https://optigoapps.com" style="color: #0a66c2; text-decoration: none;">https://optigoapps.com</a>
-                        </p>
-                    </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                    <td style="background-color: #f0f2f5; padding: 15px 20px; text-align: center; font-size: 12px; color: #888;">
-                        &copy; ${new Date().getFullYear()} OptigoApps. All rights reserved.
-                    </td>
-                    </tr>
-                </table>
-                </body>
-
-                `,
-                mode: "career",
-                ufcc: isLocal ? "orail25" : "test74",
-                templateNo: 0
-            };
-        }
-
-        throw new Error("Invalid email type");
+                    </body>
+                 `,
+            mode: "OPTIGO_CONTECT_AND_CARRER",
+            ufcc: isLocal ? "orail25" : "test74",
+            templateNo: 0
+        };
     };
 
     const handleResumeUpload = (e) => {
@@ -346,7 +427,7 @@ const CareerForm = () => {
 
         // --- Validations ---
         if (!firstName?.trim()) newErrors.firstName = "Please enter your first name";
-        if (!middleName?.trim()) newErrors.middleName = "Please enter your middle name";
+        // if (!middleName?.trim()) newErrors.middleName = "Please enter your middle name";
         if (!lastName?.trim()) newErrors.lastName = "Please enter your last name";
         if (!gender) newErrors.gender = "Please select your gender";
 
@@ -356,27 +437,47 @@ const CareerForm = () => {
             newErrors.email = "Please enter a valid email address";
         }
 
-        if (!mobileCode && !mobile) {
-            newErrors.mobileCode = "Please select your country code";
+        if (!mobile) {
             newErrors.mobile = "Please enter your mobile number";
-        } else {
-            if (mobileCode == "") {
-                newErrors.mobileCode = "Please select your country code";
-            }
-            if (mobile == "") {
-                newErrors.mobile = "Please enter your mobile number";
-            } else if (!/^\d+$/.test(mobile)) {
-                newErrors.mobile = "Mobile number must contain only numbers";
-            } else if (mobile.length < minLen || mobile.length > maxLen) {
-                newErrors.mobile =
-                    minLen === maxLen
-                        ? `Mobile number must be ${maxLen} digits`
-                        : `Mobile number must be between ${minLen} and ${maxLen} digits`;
-            }
+        } else if (!/^\d+$/.test(mobile)) {
+            newErrors.mobile = "Mobile number must contain only numbers";
+        } else if (mobile.length < maxLen) {
+            newErrors.mobile = "Mobile number must be 10 digits";
         }
 
+        // if (!mobileCode && !mobile) {
+        //     newErrors.mobileCode = "Please select your country code";
+        //     newErrors.mobile = "Please enter your mobile number";
+        // } else {
+        //     if (mobileCode == "") {
+        //         newErrors.mobileCode = "Please select your country code";
+        //     }
+        //     if (mobile == "") {
+        //         newErrors.mobile = "Please enter your mobile number";
+        //     } else if (!/^\d+$/.test(mobile)) {
+        //         newErrors.mobile = "Mobile number must contain only numbers";
+        //     } else if (mobile.length < minLen || mobile.length > maxLen) {
+        //         newErrors.mobile =
+        //             minLen === maxLen
+        //                 ? `Mobile number must be ${maxLen} digits`
+        //                 : `Mobile number must be between ${minLen} and ${maxLen} digits`;
+        //     }
+        // }
+
         if (!years?.trim()) newErrors.years = "Please enter your experience in years or months";
-        if (!joinDays || parseInt(joinDays) <= 0) newErrors.joinDays = "Please enter the number of days to join";
+        // if (!joinDays || parseInt(joinDays) <= 0) newErrors.joinDays = "Please enter the number of days to join";
+        if(!joinDays) {
+            newErrors.joinDays = "Please select joining date";
+        } else if (joinDays) {
+            const selectedDate = new Date(joinDays);
+            const today = new Date();
+            selectedDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            if (selectedDate < today) {
+                newErrors.joinDays = "Previous date id not allowed";
+            }
+        }
+        
         if (!currentLocation?.trim()) newErrors.currentLocation = "Please enter your current location";
         if (!department?.trim()) newErrors.department = "Please select your department";
         if (consent !== true) newErrors.consent = "Please accept the terms and conditions";
@@ -414,18 +515,20 @@ const CareerForm = () => {
             };
 
             // --- Submit Career Form ---
-            const careerForm = await CareerFormApi(updatedFormData);
+            // const careerForm = await CareerFormApi(updatedFormData);
 
-            if (careerForm?.Data?.rd?.[0]?.stat === 1) {
+            // if (careerForm?.Data?.rd?.[0]?.stat === 1) {
                 // --- Send Emails ---
-                const hrData = buildEmailData("hr", updatedFormData);
-                const applicantData = buildEmailData("applicant", updatedFormData);
+                const data = buildEmailData(updatedFormData);
+                // const hrData = buildEmailData("hr", updatedFormData);
+                // const applicantData = buildEmailData("applicant", updatedFormData);
 
                 // Run separately first for debugging
-                await EmailSending({ attachments: [{ file: resumeFile }], emailData: hrData });
-                await EmailSending({ attachments: [{ file: resumeFile }], emailData: applicantData });
+                await CustEmailSending({ attachments: [{ file: resumeFile }], emailData: data });
+                // await EmailSending({ attachments: [{ file: resumeFile }], emailData: hrData });
+                // await EmailSending({ attachments: [{ file: resumeFile }], emailData: applicantData });
 
-                toast.success("Form submitted successfully");
+                // toast.success("Form submitted successfully");
 
                 setFormData({
                     firstName: '',
@@ -444,10 +547,11 @@ const CareerForm = () => {
                     fileUrl: '',
                 });
                 setResumeFile(null);
-                setErrors({})
-            } else {
-                toast.error(careerForm?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
-            }
+                setErrors({});
+                setIsSuccess(true);
+            // } else {
+            //     toast.error(careerForm?.Data?.rd?.[0]?.stat_msg || "Error while submitting form");
+            // }
         } catch (error) {
             console.error("Error during form submission process:", error);
             toast.error("An unexpected error occurred.");
@@ -463,261 +567,362 @@ const CareerForm = () => {
             <LoadingModal isOpen={isLoading} />
             {/* <h1 className="apply-form-heading">Apply for: {jobSlug.replace(/-/g, ' ')}</h1> */}
             {/* <span onClick={() => navigate.push('/careers')} className="back-link">← Back to all job openings</span> */}
+            {isSuccess ? (
+                <div className="contact-success-box">
+                    <div className="success-icon">✔</div>
 
-            <div
-                className="upload-box"
-                onClick={() => fileInputRef.current.click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-            >
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    id="resumeUpload"
-                    name="resume"
-                    accept=".doc,.docx,.pdf,.jpg,.png"
-                    onChange={handleResumeUpload}
-                    style={{ display: 'none' }}
-                />
-                <label htmlFor="resumeUpload" className="upload-link">
-                    Upload resume
-                </label>
-                <p>
-                    10MB max file size (Allowed file types are
-                    <strong> .doc, .pdf, .docx, .jpg, .png</strong>).
-                </p>
-                {resumeFile && (
-                    <p className="success-text">Uploaded: {resumeFile.name}</p>
-                )}
-                {resumeError && <p className="error-text">{resumeError}</p>}
-            </div>
+                    <h3><strong>Thank you for applying!</strong></h3>
 
-            <form>
-                <div className="form-grid">
-                    <div className="form-field">
-                        <label htmlFor="firstName">First Name *</label>
+                    <p>
+                        We’ve received your application successfully.
+                        Our HR team will review your profile and contact you
+                        if it matches our requirements.
+                    </p>
+
+                    <button
+                    className="submit-btn"
+                    onClick={() => setIsSuccess(false)}
+                    >
+                        Apply for another position
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <div
+                        className="upload-box"
+                        onClick={() => fileInputRef.current.click()}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                    >
                         <input
-                            type="text"
-                            name="firstName"
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
+                            type="file"
+                            ref={fileInputRef}
+                            id="resumeUpload"
+                            name="resume"
+                            accept=".doc,.docx,.pdf,.jpg,.png"
+                            onChange={handleResumeUpload}
+                            style={{ display: 'none' }}
                         />
-                        {errors.firstName && <p className="error-text">{errors.firstName}</p>}
+                        <label htmlFor="resumeUpload" className="upload-link">
+                            Upload resume
+                        </label>
+                        <p>
+                            10MB max file size (Allowed file types are
+                            <strong> .doc, .pdf, .docx, .jpg, .png</strong>).
+                        </p>
+                        {resumeFile && (
+                            <p className="success-text">Uploaded: {resumeFile.name}</p>
+                        )}
+                        {resumeError && <p className="error-text">{resumeError}</p>}
                     </div>
 
-                    <div className="form-field">
-                        <label htmlFor="middleName">Middle Name *</label>
-                        <input
-                            type="text"
-                            name="middleName"
-                            id="middleName"
-                            value={formData.middleName}
-                            onChange={handleChange}
-                        />
-                        {errors.middleName && <p className="error-text">{errors.middleName}</p>}
-                    </div>
+                    <form>
+                        <div className="form-grid">
+                            <div className="form-field">
+                                <label htmlFor="firstName">First Name *</label>
+                                <input
+                                    type="text"
+                                    name="firstName"
+                                    id="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                />
+                                {errors.firstName && <p className="error-text">{errors.firstName}</p>}
+                            </div>
 
-                    <div className="form-field">
-                        <label htmlFor="lastName">Last Name *</label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                        />
-                        {errors.lastName && <p className="error-text">{errors.lastName}</p>}
-                    </div>
+                            {/* <div className="form-field">
+                                <label htmlFor="middleName">Middle Name *</label>
+                                <input
+                                    type="text"
+                                    name="middleName"
+                                    id="middleName"
+                                    value={formData.middleName}
+                                    onChange={handleChange}
+                                />
+                                {errors.middleName && <p className="error-text">{errors.middleName}</p>}
+                            </div> */}
 
-                    <div className="form-field">
-                        <label htmlFor="gender">Gender *</label>
-                        <div className="select-wrapper-carform">
-                            <select
-                                id="gender"
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                            >
-                                <option value="">Select an option</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                            </select>
+                            <div className="form-field">
+                                <label htmlFor="lastName">Last Name *</label>
+                                <input
+                                    type="text"
+                                    name="lastName"
+                                    id="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                />
+                                {errors.lastName && <p className="error-text">{errors.lastName}</p>}
+                            </div>
 
-                            {/* Custom arrow */}
-                            <ChevronDown className="select-icon" size={18} />
-                        </div>
-                        {errors.gender && <p className="error-text">{errors.gender}</p>}
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="email">Email *</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                        />
-                        {errors.email && <p className="error-text">{errors.email}</p>}
-                    </div>
-
-                    <div className="form-field mobile-field">
-                        <label>Mobile Phone *</label>
-                        <div className="mobile-inputs">
-                            <div className='mobile-input-div'>
+                            <div className="form-field">
+                                <label htmlFor="gender">Gender *</label>
                                 <div className="select-wrapper-carform">
                                     <select
-                                        id="mobileCode"
-                                        name="mobileCode"
-                                        value={formData.mobileCode}
-                                        onChange={(e) => {
-                                            handleChange(e);
-                                            if (errors.mobileCode) {
-                                                setErrors(prev => ({ ...prev, mobileCode: "" }));
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            if (!formData.mobileCode) {
-                                                setErrors(prev => ({ ...prev, mobileCode: "Please select your country code" }));
-                                            }
-                                        }}
-                                        className={errors.mobileCode ? "error" : ""}
+                                        id="gender"
+                                        name="gender"
+                                        value={formData.gender}
+                                        onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        {countryCodes.map((country) => (
-                                            <option key={country.code} value={country.code}>
-                                                {country.label} (+{country.phone})
-                                            </option>
-                                        ))}
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        {/* <option>Other</option> */}
                                     </select>
 
                                     {/* Custom arrow */}
                                     <ChevronDown className="select-icon" size={18} />
                                 </div>
+                                {errors.gender && <p className="error-text">{errors.gender}</p>}
                             </div>
 
+                            <div className="form-field">
+                                <label htmlFor="email">Email *</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                />
+                                {errors.email && <p className="error-text">{errors.email}</p>}
+                            </div>
+
+                            <div className="form-field mobile-field">
+                                <label>Mobile Number *</label>
+                                <div className="mobile-inputs">
+                                    {/* <div className='mobile-input-div'> */}
+                                        {/* <div className="select-wrapper-carform1" ref={dropdownRef}> */}
+                                            {/* <div
+                                                className={`custom-select-box ${errors.mobileCode ? "error" : ""}`}
+                                                onClick={() => setIsOpen(!isOpen)}
+                                                onBlur={() => {
+                                                if (!formData.mobileCode) {
+                                                    setErrors(prev => ({ ...prev, mobileCode: "Please select your country code" }));
+                                                }
+                                                }}
+                                                tabIndex={0}
+                                            >
+                                                {formData.mobileCode
+                                                ? countryCodes.find(c => c.code === formData.mobileCode)?.label +
+                                                    " (+" +
+                                                    countryCodes.find(c => c.code === formData.mobileCode)?.phone +
+                                                    ")"
+                                                : "Select"}
+
+                                                <ChevronDown className="select-icon" size={18} />
+                                            </div> */}
+
+                                            {/* {isOpen && (
+                                                <div className="custom-dropdown-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search country or code"
+                                                        value={search}
+                                                        onChange={(e) => setSearch(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            const list = countryCodes.filter(
+                                                              (c) =>
+                                                                c.label.toLowerCase().includes(search.toLowerCase()) ||
+                                                                c.code.toLowerCase().includes(search.toLowerCase()) ||
+                                                                c.phone.includes(search)
+                                                            );
+                                                        
+                                                            if (e.key === "ArrowDown") {
+                                                              e.preventDefault();
+                                                              setActiveIndex(i => (i < list.length - 1 ? i + 1 : 0));
+                                                            }
+                                                        
+                                                            if (e.key === "ArrowUp") {
+                                                              e.preventDefault();
+                                                              setActiveIndex(i => (i > 0 ? i - 1 : list.length - 1));
+                                                            }
+                                                        
+                                                            if (e.key === "Enter" && activeIndex >= 0) {
+                                                              e.preventDefault();
+                                                              const selected = list[activeIndex];
+                                                        
+                                                              handleChange({
+                                                                target: {
+                                                                  name: "mobileCode",
+                                                                  value: selected.code,
+                                                                },
+                                                              });
+                                                        
+                                                              setIsOpen(false);
+                                                              setSearch("");
+                                                              setActiveIndex(-1);
+                                                              setErrors(prev => ({ ...prev, mobileCode: "" }));
+                                                            }
+                                                        }}
+                                                        
+                                                    />
+
+                                                    <ul>
+                                                        {countryCodes
+                                                            .filter(
+                                                                (c) =>
+                                                                c.label.toLowerCase().includes(search.toLowerCase()) ||
+                                                                c.code.toLowerCase().includes(search.toLowerCase()) ||
+                                                                c.phone.includes(search)
+                                                            )
+                                                            .map((country, index) => (
+                                                                <li
+                                                                    ref={(el) => (itemRefs.current[index] = el)}
+                                                                    key={country.code}
+                                                                    className={
+                                                                        `${index === activeIndex ? "active" : ""}
+                                                                        ${index < 6 ? "top-highlight" : ""}`
+                                                                    }
+                                                                    style={{
+                                                                        borderBottom: index === 5 ? "1px solid #dedede" : "none"
+                                                                    }}
+                                                                    onMouseEnter={() => setActiveIndex(index)}
+                                                                    onClick={() => {
+                                                                        handleChange({
+                                                                        target: {
+                                                                            name: "mobileCode",
+                                                                            value: country.code,
+                                                                        },
+                                                                        });
+                                                                        setIsOpen(false);
+                                                                        setSearch("");
+                                                                        setActiveIndex(-1);
+                                                                        setErrors(prev => ({ ...prev, mobileCode: "" }));
+                                                                    }}
+                                                                >
+                                                                    <span> {country.label} (+{country.phone}) </span>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            )} */}
+                                            {/* </div> */}
+                                        </div>
+                                    <input
+                                        type="tel"
+                                        name="mobile"
+                                        id="mobile"
+                                        value={formData.mobile}
+                                        maxLength={maxLen}
+                                        onChange={handleChange}
+                                        // placeholder="Phone number"
+                                    />
+                                {/* </div> */}
+                                {/* <p style={{ marginTop: "0.5rem", color: "#555" }}>
+                                    Max {maxLen} digits allowed for selected country
+                                </p> */}
+                                {/* {errors.mobileCode && <span className="error-text">{errors.mobileCode}</span>} */}
+                                {errors.mobile && <p className="error-text">{errors.mobile}</p>}
+                            </div>
+
+                            <div className="form-field experience-field">
+                                <label>Work Experience (e.g. 6 Months / 1 Year ) *</label>
+                                <div className="experience-inputs">
+                                    <input
+                                        type="text"
+                                        // placeholder="Years"
+                                        name='years'
+                                        id="years"
+                                        value={formData.years}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                {errors.years && <p className="error-text">{errors.years}</p>}
+                            </div>
+
+                            <div className="form-field">
+                                <label htmlFor="joinDays">Available To Join From (date) *</label>
+                                <input
+                                    type="date"
+                                    name="joinDays"
+                                    id="joinDays"
+                                    value={formData.joinDays}
+                                    min={new Date().toISOString().split("T")[0]}
+                                    // onChange={(e) => {
+                                    //     const value = e.target.value;
+                                    //     // Allow only digits
+                                    //     if (/^\d*$/.test(value)) {
+                                    //         handleChange(e);
+                                    //     }
+                                    // }}
+                                    onChange={handleChange}
+                                    // placeholder="Enter number of days"
+                                />
+                                {errors.joinDays && <p className="error-text">{errors.joinDays}</p>}
+                            </div>
+
+                            <div className="form-field">
+                                <label htmlFor="currentLocation">Current City *</label>
+                                <input
+                                    type="text"
+                                    name="currentLocation"
+                                    id="currentLocation"
+                                    value={formData.currentLocation}
+                                    onChange={handleChange}
+                                />
+                                {errors.currentLocation && <p className="error-text">{errors.currentLocation}</p>}
+                            </div>
+
+                            <div className="form-field">
+                                <label htmlFor="department">Select Field/Department *</label>
+                                <div className="select-wrapper-carform">
+                                    <select
+                                        id="department"
+                                        name="department"
+                                        value={formData.department}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            if (errors.department) {
+                                                setErrors((prev) => ({ ...prev, department: "" }));
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (!formData.department) {
+                                                setErrors((prev) => ({ ...prev, department: "Please select a department." }));
+                                            }
+                                        }}
+                                        className={errors.department ? "error" : ""}
+                                    >
+                                        <option value="">Select</option>
+                                        {sortedData.map((job) => (
+                                            <option key={job.id} value={job.title}>
+                                                {job.title}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {errors.department && (
+                                        <span className="error-text">{errors.department}</span>
+                                    )}
+
+                                    {/* Custom arrow */}
+                                    <ChevronDown className="select-icon" size={18} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <label className="consent-checkbox">
                             <input
-                                type="tel"
-                                name="mobile"
-                                id="mobile"
-                                value={formData.mobile}
-                                maxLength={maxLen}
-                                onChange={handleChange}
-                                placeholder="Phone number"
-                            />
-                        </div>
-                        <p style={{ marginTop: "0.5rem", color: "#555" }}>
-                            Max {maxLen} digits allowed for selected country
-                        </p>
-                        {errors.mobileCode && <span className="error-text">{errors.mobileCode}</span>}
-                        {errors.mobile && <p className="error-text">{errors.mobile}</p>}
-                    </div>
-
-                    <div className="form-field experience-field">
-                        <label>Work Experience (e.g., 2 Years / 12 Months) *</label>
-                        <div className="experience-inputs">
-                            <input
-                                type="text"
-                                placeholder="Years"
-                                name='years'
-                                id="years"
-                                value={formData.years}
+                                type="checkbox"
+                                name="consent"
+                                checked={formData.consent === true}
                                 onChange={handleChange}
                             />
+                            <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column" }}>
+                                By applying, you hereby accept the data processing terms under the and give consent to processing of the data as part of this job application.
+                                {errors.consent && <p className="error-text">{errors.consent}</p>}
+                            </div>
+                        </label>
+
+                        <div className='submit-div'>
+                            <button type="submit" className="submit-btn" onClick={handleSubmit} disabled={isLoading}>
+                                {isLoading ? 'Submitting...' : 'Apply Now'}
+                            </button>
                         </div>
-                        {errors.years && <p className="error-text">{errors.years}</p>}
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="joinDays">Available To Join (in days) *</label>
-                        <input
-                            type="text"
-                            name="joinDays"
-                            id="joinDays"
-                            value={formData.joinDays}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                // Allow only digits
-                                if (/^\d*$/.test(value)) {
-                                    handleChange(e);
-                                }
-                            }}
-                            placeholder="Enter number of days"
-                        />
-                        {errors.joinDays && <p className="error-text">{errors.joinDays}</p>}
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="currentLocation">Current Location *</label>
-                        <input
-                            type="text"
-                            name="currentLocation"
-                            id="currentLocation"
-                            value={formData.currentLocation}
-                            onChange={handleChange}
-                        />
-                        {errors.currentLocation && <p className="error-text">{errors.currentLocation}</p>}
-                    </div>
-
-                    <div className="form-field">
-                        <label htmlFor="department">Select Field/Department *</label>
-                        <div className="select-wrapper-carform">
-                            <select
-                                id="department"
-                                name="department"
-                                value={formData.department}
-                                onChange={(e) => {
-                                    handleChange(e);
-                                    if (errors.department) {
-                                        setErrors((prev) => ({ ...prev, department: "" }));
-                                    }
-                                }}
-                                onBlur={() => {
-                                    if (!formData.department) {
-                                        setErrors((prev) => ({ ...prev, department: "Please select a department." }));
-                                    }
-                                }}
-                                className={errors.department ? "error" : ""}
-                            >
-                                <option value="">Select</option>
-                                {jobData.map((job) => (
-                                    <option key={job.id} value={job.title}>
-                                        {job.title}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {errors.department && (
-                                <span className="error-text">{errors.department}</span>
-                            )}
-
-                            {/* Custom arrow */}
-                            <ChevronDown className="select-icon" size={18} />
-                        </div>
-                    </div>
-                </div>
-
-                <label className="consent-checkbox">
-                    <input
-                        type="checkbox"
-                        name="consent"
-                        checked={formData.consent === true}
-                        onChange={handleChange}
-                    />
-                    <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column" }}>
-                        By applying, you hereby accept the data processing terms under the and give consent to processing of the data as part of this job application.
-                        {errors.consent && <p className="error-text">{errors.consent}</p>}
-                    </div>
-                </label>
-
-                <div className='submit-div'>
-                    <button type="submit" className="submit-btn" onClick={handleSubmit} disabled={isLoading}>
-                        {isLoading ? 'Submitting...' : 'Apply Now'}
-                    </button>
-                </div>
-            </form>
+                    </form>
+                </>
+            )}
         </div>
     );
 };
