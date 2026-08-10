@@ -1,6 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import './Home.scss'
+import TestimonialSection from '../ui/TestimonialSection'
 
 // Dynamically imported components
 const Features = dynamic(() => import('../Features/Features'))
@@ -23,6 +24,7 @@ const Home = () => {
             <Features1 />
             {/* <Tabview /> */}
             <TabView1 />
+            <TestimonialSection/>
             <BlogCards />
             <FaqsSection />
             <div id="contact-section">

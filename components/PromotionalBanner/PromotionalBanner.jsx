@@ -30,19 +30,23 @@ const PromotionalBanner = () => {
 
     return (
         <Dialog open={visible} onOpenChange={setVisible}>
-            <DialogContent className="promo-modal-overlay hide-close-button">
+            <DialogContent showCloseButton={false} className="promo-modal-overlay hide-close-button p-0 border-0 bg-transparent shadow-none">
                 <VisuallyHidden>
                     <DialogTitle>Promotional Offer</DialogTitle>
                 </VisuallyHidden>
 
                 <div className="promo-modal">
-                    <button className="close-btn" onClick={() => setVisible(false)}>×</button>
-                    <img src="/promo.webp" alt="Offer Jewellery" className="promo-image" />
-                    <h2 className="promo-title">Turn Browsers into Buyers with Procatalog</h2>
-                    <p className="promo-text">
-                        Showcase designs digitally, sync with ERP, and sell smarter.
-                    </p>
-                    <Link href="/apps-and-ecommerce/apps/b2b-and-b2c-catalog-sharing/" onClick={(e) => { handleNavigation(e, "/apps-and-ecommerce/apps/b2b-and-b2c-catalog-sharing/"); setVisible(false) }} className="promo-cta">DISCOVER NOW</Link>
+                    <div className="promo-image-container">
+                        <img src="/promo.webp" alt="ProCatalog Offer" className="promo-image" />
+                    </div>
+                    <div className="promo-details">
+                        <button className="close-btn" onClick={() => setVisible(false)} aria-label="Close modal">×</button>
+                        <h2 className="promo-title">Turn Browsers into Buyers with Procatalog</h2>
+                        <p className="promo-text">
+                            Showcase designs digitally, sync with ERP, and sell smarter.
+                        </p>
+                        <Link href="/apps-and-ecommerce/apps/b2b-and-b2c-catalog-sharing/" onClick={(e) => { handleNavigation(e, "/apps-and-ecommerce/apps/b2b-and-b2c-catalog-sharing/"); setVisible(false) }} className="promo-cta">DISCOVER NOW</Link>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

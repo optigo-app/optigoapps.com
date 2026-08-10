@@ -21,124 +21,144 @@
 }
 
 .promo-modal-overlay {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 0;
-    max-width: 400px;
-    opacity: 0;
-    animation: fadeIn 0.3s ease-out forwards;
-    animation-delay: 0.1s;
-
-    @media (max-width: 600px) {
-        max-width: 93%;
-        margin-inline: auto;
-    }
+    padding: 0 !important;
+    max-width: 800px !important;
+    width: 90vw !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .promo-modal {
-    background: #fff;
-    max-width: 480px;
+    background: #ffffff;
     width: 100%;
-    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     border-radius: 8px;
-    text-align: center;
+    overflow: hidden;
     position: relative;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    animation-delay: 0.2s;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    text-align: left;
+    padding: 0;
 
-    @media (max-width: 600px) {
-        padding-inline: 1rem;
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
     }
 
-    .close-btn {
-        position: absolute;
-        top: 0px;
-        right: -1px;
-        width: 35px;
-        height: 35px;
-        font-size: 1.5rem;
-        font-weight: 600;
-        background-color: transparent;
-        // border: 1px solid #ccc;
-        border-radius: 50%;
-        padding-top: 3px;
-        padding-left: 1px;
-        color: #333;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            // background-color: #f5f5f5;
-            // border-color: #999;
-            color: #000;
-        }
-
-        &:focus {
-            outline: none;
-            // box-shadow: 0 0 0 2px rgba(245, 214, 123, 0.4); // subtle gold glow
-        }
-    }
-
-    .promo-image {
+    .promo-image-container {
         width: 100%;
-        height: auto;
-        border-radius: 4px;
-        margin-bottom: 1.5rem;
-    }
+        height: 100%;
+        min-height: 380px;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #0f172a;
+        display: flex;
 
-    .promo-title {
-        font-size: 1.8rem;
-        font-weight: 500;
-        margin-bottom: 1rem;
-        font-family: 'Playfair Display', serif;
-        color: #111;
-        line-height: 1.5;
+        .promo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
 
-        @media (max-width: 768px) {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
+        @media (max-width: 640px) {
+            min-height: 220px;
+            max-height: 260px;
         }
     }
 
-    .promo-text {
-        font-size: 0.9rem;
-        color: #444;
-        margin-bottom: 2rem;
-        line-height: 1.5;
+    .promo-details {
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        text-align: left;
+        position: relative;
+        background: #ffffff;
 
         @media (max-width: 768px) {
-            font-size: 0.8rem;
-            margin-bottom: 1.2rem;
+            padding: 2.25rem 1.75rem;
         }
-    }
 
-    .promo-cta {
-        background-color: #000;
-        color: #fff;
-        padding: 0.75rem 2rem;
-        border: none;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
+        .close-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            width: 32px;
+            height: 32px;
+            font-size: 1.4rem;
+            line-height: 1;
+            color: #64748b;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
 
-        &:hover {
-            background-color: #333;
+            &:hover {
+                background: #e2e8f0;
+                color: #0f172a;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .promo-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #0f172a;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+
+            @media (max-width: 768px) {
+                font-size: 1.35rem;
+                margin-bottom: 0.75rem;
+            }
+        }
+
+        .promo-text {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+
+            @media (max-width: 768px) {
+                font-size: 0.875rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .promo-cta {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+
+            &:hover {
+                background-color: #1e293b;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+            }
         }
     }
 }

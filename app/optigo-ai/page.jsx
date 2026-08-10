@@ -246,7 +246,7 @@ const page = () => {
             <div className="max-w-4xl mx-auto text-center px-6">
               <h2 className="text-3xl font-bold text-white mb-4">Ready to Experience AI Inside Your ERP?</h2>
               <p className="text-purple-100 mb-6">Discover how Optigo AI transforms everyday jewellery business operations.</p>
-              <a  href="#" onClick={() => setIsModalOpen(true)}  className="bg-white text-purple-700 px-8 py-3 rounded-lg font-semibold hover:bg-purple-100">
+              <a href="#" onClick={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="inline-block mt-2 bg-white text-purple-700 px-8 py-3 rounded-lg font-semibold shadow hover:bg-purple-100 transition-colors">
                 Book a Demo Now
               </a>
             </div>
