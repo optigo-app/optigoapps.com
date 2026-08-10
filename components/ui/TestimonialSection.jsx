@@ -200,6 +200,9 @@ export default function TestimonialSection() {
     );
   };
 
+  const totalCards = testimonials.length;
+  const isThreeOrLess = totalCards <= 3;
+
   return (
     <section className="w-full bg-[#f6f6f8] pt-12 md:pt-16 pb-4 md:pb-6 px-4 sm:px-6 lg:px-12 overflow-hidden rounded-lg">
       <div className="w-full mx-auto">
@@ -228,16 +231,16 @@ export default function TestimonialSection() {
               onSwiper={setSwiperRef}
               modules={[Navigation, Autoplay]}
               spaceBetween={24}
-              slidesPerView={3.2}
+              slidesPerView={isThreeOrLess ? 3 : 3.2}
               breakpoints={{
                 0: { slidesPerView: 1, spaceBetween: 16 },
                 210: { slidesPerView: 1, spaceBetween: 16 },
-              320: { slidesPerView: 1, spaceBetween: 16 },
-              640: { slidesPerView: 2, spaceBetween: 20 },
-                1024: { slidesPerView: 3.2, spaceBetween: 24 },
-              1280: { slidesPerView: 3.5, spaceBetween: 24 },
+                320: { slidesPerView: 1, spaceBetween: 16 },
+                640: { slidesPerView: 2, spaceBetween: 20 },
+                1024: { slidesPerView: isThreeOrLess ? 3 : 3.2, spaceBetween: 24 },
+                1280: { slidesPerView: isThreeOrLess ? 3 : 3.5, spaceBetween: 24 },
               }}
-              autoplay={{ delay: 6000, disableOnInteraction: false }}
+              // autoplay={{ delay: 6000, disableOnInteraction: false }}
               className="w-full"
             >
               {testimonials.map((item) => (
@@ -252,7 +255,7 @@ export default function TestimonialSection() {
           )}
 
           {/* Bottom Right Swiper Navigation Controls */}
-          <div className="flex items-center justify-end gap-3 mt-4 md:mt-6">
+          <div className={`flex items-center justify-end gap-3 mt-4 md:mt-6 ${isThreeOrLess ? 'lg:hidden' : ''}`}>
             <button
               onClick={() => swiperRef?.slidePrev()}
               aria-label="Previous slide"
