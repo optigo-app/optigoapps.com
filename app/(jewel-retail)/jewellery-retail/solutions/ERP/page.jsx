@@ -4,7 +4,7 @@ import Industries from '@/components/Industries/Industries'
 import { generatePageMetadata } from "@/utils/HeadMeta";
 import { pages } from "@/utils/pages";
 
-export const metadata = generatePageMetadata(pages['/jewellery-retail/solutions/ERP']);
+export const metadata = generatePageMetadata(pages['/jewellery-retail/solutions/erp']);
 
 const page = () => {
 

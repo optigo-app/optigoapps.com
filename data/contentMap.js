@@ -187,3 +187,5 @@ const contentMap = {
   }
 
 };
+
+export default contentMap;
