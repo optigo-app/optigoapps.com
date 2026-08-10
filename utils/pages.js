@@ -1338,11 +1338,11 @@ export const pages = {
         ]
     },
 
-    '/jewellery-retail/solutions/ERP': {
+    '/jewellery-retail/solutions/erp': {
         title: "Jewellery ERP Software – Complete Retail Management",
         description:
             "Optigo ERP is an all-in-one jewellery retail management software. From billing, POS, and CRM to inventory, accounting, and reporting—manage your entire jewellery business seamlessly with a centralized ERP system built for retailers.",
-        url: `${WEBSITE_URL}/jewellery-retail/solutions/ERP`,
+        url: `${WEBSITE_URL}/jewellery-retail/solutions/erp`,
         image: `${WEBSITE_URL}/share_logo.png`,
         keywords: [
             "Jewellery ERP software",
