@@ -239,18 +239,7 @@ const ContactModal = ({ isOpen, onClose }) => {
                                                         ${locationData.ip || "N/A"}
                                                         </td>
                                                     </tr>
-                                                    <tr>
-                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Latitude</td>
-                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
-                                                        ${locationData.latitude ?? "N/A"}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td width="34%" style="font-size:13px; color:#64748b; padding:10px 12px; background:#f8fafc; border-radius:10px 0 0 10px;">Longitude</td>
-                                                        <td style="font-size:14px; color:#0f172a; padding:10px 12px; background:#f1f5f9; border-radius:0 10px 10px 0;">
-                                                        ${locationData.longitude ?? "N/A"}
-                                                        </td>
-                                                    </tr>` : ""}
+                                                   ` : ""}
                                                 </table>
                                             </td>
                                         </tr>
