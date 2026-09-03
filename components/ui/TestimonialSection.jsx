@@ -4,8 +4,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { ArrowLeft, ArrowRight, Play, Volume2, VolumeX } from 'lucide-react';
-
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -43,49 +41,71 @@ const testimonials = [
 ];
 
 function TestimonialCard({ item, renderHighlightedQuote }) {
-  const videoRef = useRef(null);
+   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const shouldPlayRef = useRef(false);
+  const playPromiseRef = useRef(null); // track in-flight play() promise
 
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = isMuted;
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            if (videoRef.current) {
-              videoRef.current.muted = true;
-              videoRef.current
-                .play()
-                .then(() => setIsPlaying(true))
-                .catch(() => setIsPlaying(false));
-            }
-          });
-      }
+const safePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = isMuted;
+    const p = video.play();
+    playPromiseRef.current = p;
+    if (p !== undefined) {
+      p.then(() => {
+        playPromiseRef.current = null;
+        if (!shouldPlayRef.current && videoRef.current) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          setIsPlaying(true);
+        }
+      }).catch(() => {
+        playPromiseRef.current = null;
+        if (shouldPlayRef.current && videoRef.current) {
+          videoRef.current.muted = true;
+          setIsMuted(true);
+          const retry = videoRef.current.play();
+          playPromiseRef.current = retry;
+          retry
+            .then(() => { playPromiseRef.current = null; setIsPlaying(true); })
+            .catch(() => { playPromiseRef.current = null; setIsPlaying(false); });
+        }
+      });
     }
   };
 
+  const handleMouseEnter = () => {
+    shouldPlayRef.current = true;
+    safePlay();
+  };
+
   const handleMouseLeave = () => {
-    if (videoRef.current) {
+    shouldPlayRef.current = false;
+    // Don't pause synchronously if a play() is still pending —
+    // let the .then() above handle it once play() resolves.
+    if (!playPromiseRef.current && videoRef.current) {
       videoRef.current.pause();
       setIsPlaying(false);
     }
   };
 
-  const toggleMute = (e) => {
+    const toggleMute = (e) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      const nextMutedState = !isMuted;
-      videoRef.current.muted = nextMutedState;
-      videoRef.current.volume = 1.0;
-      setIsMuted(nextMutedState);
-      if (videoRef.current.paused) {
-        videoRef.current.play().catch(() => {});
-      }
+    const video = videoRef.current;
+    if (!video) return;
+    const nextMuted = !isMuted;
+    video.muted = nextMuted;
+    video.volume = 1.0;
+    setIsMuted(nextMuted);
+    if (video.paused) {
+      shouldPlayRef.current = true;
+      safePlay();
     }
   };
+
 
   return (
     <div
@@ -97,11 +117,11 @@ function TestimonialCard({ item, renderHighlightedQuote }) {
       {/* Full Background Video */}
       <video
         ref={videoRef}
-        src={`${item.videoUrl}#t=0.001`}
+        src={item.videoUrl}
         muted={isMuted}
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
       />
 
@@ -155,11 +175,6 @@ function TestimonialCard({ item, renderHighlightedQuote }) {
 
 export default function TestimonialSection() {
   const [swiperRef, setSwiperRef] = useState(null);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Helper to render quote with brand purple highlight spans
   const renderHighlightedQuote = (quote, highlights) => {
@@ -215,44 +230,30 @@ export default function TestimonialSection() {
 
         {/* Swiper Container */}
         <div className="relative">
-          {!isMounted ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-              {testimonials.map((item) => (
-                <div key={item.id} className="w-full">
-                  <TestimonialCard
-                    item={item}
-                    renderHighlightedQuote={renderHighlightedQuote}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <Swiper
-              onSwiper={setSwiperRef}
-              modules={[Navigation, Autoplay]}
-              spaceBetween={24}
-              slidesPerView={isThreeOrLess ? 3 : 3.2}
-              breakpoints={{
-                0: { slidesPerView: 1, spaceBetween: 16 },
-                210: { slidesPerView: 1, spaceBetween: 16 },
-                320: { slidesPerView: 1, spaceBetween: 16 },
-                640: { slidesPerView: 2, spaceBetween: 20 },
-                1024: { slidesPerView: isThreeOrLess ? 3 : 3.2, spaceBetween: 24 },
-                1280: { slidesPerView: isThreeOrLess ? 3 : 3.5, spaceBetween: 24 },
-              }}
-              // autoplay={{ delay: 6000, disableOnInteraction: false }}
-              className="w-full"
-            >
-              {testimonials.map((item) => (
-                <SwiperSlide key={item.id} className="h-full">
-                  <TestimonialCard
-                    item={item}
-                    renderHighlightedQuote={renderHighlightedQuote}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          )}
+          <Swiper
+            onSwiper={setSwiperRef}
+            modules={[Navigation, Autoplay]}
+            spaceBetween={24}
+            slidesPerView={isThreeOrLess ? 3 : 3.2}
+            breakpoints={{
+              0: { slidesPerView: 1, spaceBetween: 16 },
+              210: { slidesPerView: 1, spaceBetween: 16 },
+              320: { slidesPerView: 1, spaceBetween: 16 },
+              640: { slidesPerView: 2, spaceBetween: 20 },
+              1024: { slidesPerView: isThreeOrLess ? 3 : 3.2, spaceBetween: 24 },
+              1280: { slidesPerView: isThreeOrLess ? 3 : 3.5, spaceBetween: 24 },
+            }}
+            className="w-full"
+          >
+            {testimonials.map((item) => (
+              <SwiperSlide key={item.id} className="h-full">
+                <TestimonialCard
+                  item={item}
+                  renderHighlightedQuote={renderHighlightedQuote}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
 
           {/* Bottom Right Swiper Navigation Controls */}
           <div className={`flex items-center justify-end gap-3 mt-4 md:mt-6 ${isThreeOrLess ? 'lg:hidden' : ''}`}>
